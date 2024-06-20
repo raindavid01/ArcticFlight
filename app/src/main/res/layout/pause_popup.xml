@@ -7,10 +7,11 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="200dp">
+        android:layout_height="200dp"
+        android:background="#53A5D5">
 
         <Button
-            android:id="@+id/resume"
+            android:id="@+id/resumeBtn"
             android:layout_width="159dp"
             android:layout_height="49dp"
             android:layout_gravity="center|top"
@@ -19,7 +20,7 @@
             android:gravity="center" />
 
         <Button
-            android:id="@+id/quit"
+            android:id="@+id/quitBtn"
             android:layout_width="159dp"
             android:layout_height="49dp"
             android:layout_gravity="bottom|center"

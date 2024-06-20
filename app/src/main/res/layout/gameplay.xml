@@ -18,7 +18,7 @@
         app:srcCompat="@drawable/floor" />
 
     <Button
-        android:id="@+id/pause"
+        android:id="@+id/pauseBtn"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginTop="16dp"
@@ -32,16 +32,34 @@
         android:id="@+id/pipe_top"
         android:layout_width="113dp"
         android:layout_height="302dp"
-        app:srcCompat="@drawable/pipe_top"
-        tools:layout_editor_absoluteX="149dp"
-        tools:layout_editor_absoluteY="-70dp" />
+        android:layout_marginBottom="88dp"
+        app:layout_constraintBottom_toTopOf="@+id/pipe_bottom"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.812"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/pipe_top" />
 
     <ImageView
         android:id="@+id/pipe_bottom"
         android:layout_width="113dp"
         android:layout_height="302dp"
-        app:srcCompat="@drawable/pipe_bottom"
-        tools:layout_editor_absoluteX="149dp"
-        tools:layout_editor_absoluteY="427dp" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.812"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/pipe_bottom" />
+
+    <ImageView
+        android:id="@+id/character"
+        android:layout_width="48dp"
+        android:layout_height="49dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.214"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/character1" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
