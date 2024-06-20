@@ -28,4 +28,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageView
+        android:id="@+id/pipe_top"
+        android:layout_width="113dp"
+        android:layout_height="302dp"
+        app:srcCompat="@drawable/pipe_top"
+        tools:layout_editor_absoluteX="149dp"
+        tools:layout_editor_absoluteY="-70dp" />
+
+    <ImageView
+        android:id="@+id/pipe_bottom"
+        android:layout_width="113dp"
+        android:layout_height="302dp"
+        app:srcCompat="@drawable/pipe_bottom"
+        tools:layout_editor_absoluteX="149dp"
+        tools:layout_editor_absoluteY="427dp" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
