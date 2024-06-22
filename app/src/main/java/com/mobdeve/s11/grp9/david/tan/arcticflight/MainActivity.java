@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private void showDialogSettingsPopup() {
         Dialog dialog = new Dialog(MainActivity.this);
         dialog.setContentView(R.layout.settings);
+        dialog.setCanceledOnTouchOutside(false);
         Window window = dialog.getWindow();
         if (window!= null) {
             window.setLayout(850, 1100);

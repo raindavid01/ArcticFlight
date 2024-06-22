@@ -28,6 +28,7 @@ public class GameplayActivity extends AppCompatActivity {
                 Log.d("Gameplay Activity", "pause button clicked");
                 Dialog dialog = new Dialog(GameplayActivity.this);
                 dialog.setContentView(R.layout.pause_popup);
+                dialog.setCanceledOnTouchOutside(false);
                 Window window = dialog.getWindow();
                 if (window != null) {
                     window.setBackgroundDrawableResource(R.drawable.rounded_corners);
@@ -66,6 +67,7 @@ public class GameplayActivity extends AppCompatActivity {
                 Log.d("Gameplay Activity", "character clicked");
                 Dialog dialog = new Dialog(GameplayActivity.this);
                 dialog.setContentView(R.layout.gameover_popup);
+                dialog.setCanceledOnTouchOutside(false);
                 Window window = dialog.getWindow();
                 if (window != null) {
                     //window.setBackgroundDrawableResource(R.drawable.rounded_corners);
