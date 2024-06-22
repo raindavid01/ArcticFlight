@@ -24,7 +24,8 @@ public class ShopActivity extends AppCompatActivity {
 
     int []arr={R.drawable.s1,R.drawable.s2,R.drawable.s3,R.drawable.s4,R.drawable.s5,
             R.drawable.s6,R.drawable.s7,R.drawable.s8,R.drawable.s9,R.drawable.s10,
-            R.drawable.s11,R.drawable.s12,R.drawable.s13,R.drawable.s14,R.drawable.s15};
+            R.drawable.s11,R.drawable.s12,R.drawable.s13,R.drawable.s14,R.drawable.s15,
+            R.drawable.s16,R.drawable.s17,R.drawable.s18};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

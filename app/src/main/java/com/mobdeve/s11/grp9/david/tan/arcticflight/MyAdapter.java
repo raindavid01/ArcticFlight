@@ -32,6 +32,11 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
         holder.hatIv.setImageResource(arr[position]);
         //holder.buyBtn
+        Button buyBtn = holder.itemView.findViewById(R.id.buyBtn);
+
+        buyBtn.setOnClickListener(v -> {
+            buyBtn.setBackgroundResource(R.drawable.ownbtn);
+        });
     }
 
     @Override
