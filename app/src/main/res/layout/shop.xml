@@ -19,7 +19,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <Button
-            android:id="@+id/backBtn"
+            android:id="@+id/shopbackBtn"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginTop="30dp"

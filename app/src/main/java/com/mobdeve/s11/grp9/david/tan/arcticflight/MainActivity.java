@@ -31,6 +31,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        binding.shopBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                Log.d("MainActivity", "Shop button clicked");
+                Intent intent = new Intent(MainActivity.this, ShopActivity.class); // Ensure ShopActivity.class exists
+                startActivity(intent);
+            }
+        });
+
         binding.settingsBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 Log.d("MainActivity", "Settings button clicked");
@@ -51,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         }
         dialog.show();
 
-        Button backBtn = dialog.findViewById(R.id.backBtn);
+        Button backBtn = dialog.findViewById(R.id.shopbackBtn);
 
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override

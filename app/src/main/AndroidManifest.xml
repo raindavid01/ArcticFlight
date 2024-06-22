@@ -18,6 +18,9 @@
             android:exported="false">
         </activity>
 
+        <activity android:name=".ShopActivity">
+        </activity>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
