@@ -1,9 +1,7 @@
 package com.mobdeve.s11.grp9.david.tan.arcticflight;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -23,7 +21,6 @@ public class GameplayActivity extends AppCompatActivity {
 
     private GameplayBinding binding;
     private GameScene gameScene;
-    private int record;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
