@@ -21,6 +21,9 @@
         <activity android:name=".ShopActivity">
         </activity>
 
+        <activity android:name=".GameOverActivity">
+        </activity>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

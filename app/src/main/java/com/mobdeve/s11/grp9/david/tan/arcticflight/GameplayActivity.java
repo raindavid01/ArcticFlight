@@ -1,104 +1,64 @@
 package com.mobdeve.s11.grp9.david.tan.arcticflight;
 
-import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.view.Window;
-import android.widget.Button;
+import android.util.DisplayMetrics;
+import android.view.WindowManager;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.mobdeve.s11.grp9.david.tan.arcticflight.databinding.GameoverPopupBinding;
 import com.mobdeve.s11.grp9.david.tan.arcticflight.databinding.GameplayBinding;
+import com.mobdeve.s11.grp9.david.tan.arcticflight.utils.GameConstants;
 
 public class GameplayActivity extends AppCompatActivity {
 
     private GameplayBinding binding;
+    private GameScene gameScene;
+    private int record;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        this.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        GameConstants.SCREEN_WIDTH = displayMetrics.widthPixels;
+        GameConstants.SCREEN_HEIGHT = displayMetrics.heightPixels;
+        GameConstants.CONTEXT = getApplicationContext();
+
         binding = GameplayBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        binding.pauseBtn.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                Log.d("Gameplay Activity", "pause button clicked");
-                Dialog dialog = new Dialog(GameplayActivity.this);
-                dialog.setContentView(R.layout.pause_popup);
-                dialog.setCanceledOnTouchOutside(false);
-                Window window = dialog.getWindow();
-                if (window != null) {
-                    window.setBackgroundDrawableResource(R.drawable.rounded_corners);
-                    window.setLayout(700, 500);
+        gameScene = findViewById(R.id.game_scene);
 
-                }
-                dialog.show();
+        gameScene.start();
+    }
 
-                binding.pauseBtn.setVisibility(View.INVISIBLE);
+    public void onGameOverHandler(int score) {
+        Intent intent = new Intent(this, GameOverActivity.class);
+        intent.putExtra("score", score);
+        startActivity(intent);
+        finish();
+    }
 
-                Button quitBtn = dialog.findViewById(R.id.quitBtn);
-                Button resumeBtn = dialog.findViewById(R.id.resumeBtn);// Assuming 'quit' is the ID of your quit button
+    private void storeData()
+    {
+        SharedPreferences sharedPreferences = getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
 
-                quitBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dialog.dismiss();
-                        Log.d("Gameplay Activity", "quit button clicked");
-                        Intent intent = new Intent(GameplayActivity.this, MainActivity.class);
-                        startActivity(intent);
-                    }
-                });
+        editor.putInt("record", record);
 
-                resumeBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dialog.dismiss();
-                        binding.pauseBtn.setVisibility(View.VISIBLE);
-                    }
-                });
-            }
-        });
+        editor.apply();
+    }
 
-        binding.character.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                Log.d("Gameplay Activity", "character clicked");
-                Dialog dialog = new Dialog(GameplayActivity.this);
-                dialog.setContentView(R.layout.gameover_popup);
-                dialog.setCanceledOnTouchOutside(false);
-                Window window = dialog.getWindow();
-                if (window != null) {
-                    //window.setBackgroundDrawableResource(R.drawable.rounded_corners);
-                    window.setLayout(1100, 1100);
-                    window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+    private void loadData()
+    {
+        SharedPreferences sharedPreferences = getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
 
-                }
-                dialog.show();
-
-                Button retryBtn = dialog.findViewById(R.id.retryBtn);
-                Button homeBtn = dialog.findViewById(R.id.homedeathBtn);// Assuming 'quit' is the ID of your quit button
-
-                retryBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dialog.dismiss();
-                        Log.d("Gameplay Activity", "quit button clicked");
-                    }
-                });
-
-                homeBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dialog.dismiss();
-                        Intent intent = new Intent(GameplayActivity.this, MainActivity.class);
-                        startActivity(intent);
-
-                    }
-                });
-            }
-        });
-
+        record = sharedPreferences.getInt("record", 0);
     }
 }

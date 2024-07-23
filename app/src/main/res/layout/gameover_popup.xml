@@ -48,7 +48,6 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:fontFamily="@font/pixelated"
-                    android:text="50"
                     android:textColor="#ECF9FF"
                     android:textSize="24sp"
                     android:textStyle="bold" />
