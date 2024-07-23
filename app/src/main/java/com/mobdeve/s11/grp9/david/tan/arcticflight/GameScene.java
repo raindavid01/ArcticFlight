@@ -282,15 +282,14 @@ public class GameScene extends GameView {
         for (BaseGround baseGround : baseGrounds) {
             if (bird.collisionCheck(baseGround)) {
                 playSound(R.raw.damage_sound);
-                bird.IsDead = true;
-                bird.setVelocity(new Vector2(bird.getVelocity().x, 3.8f));
+                bird.onDamage();
             }
         }
 
         for (Pipe pipe : pipes) {
             if (bird.collisionCheck(pipe)) {
                 playSound(R.raw.damage_sound);
-                bird.IsDead = true;
+                bird.onDamage();
             }
         }
 
@@ -300,6 +299,7 @@ public class GameScene extends GameView {
             coinCount++;
         }
     }
+
 
     private void reloadSpeed() {
         bird.setVelocity(Vector2.multiply(Vector2.Right, fixed_speed / 5));

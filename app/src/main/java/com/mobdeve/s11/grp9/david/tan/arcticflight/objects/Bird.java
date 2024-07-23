@@ -1,7 +1,6 @@
 package com.mobdeve.s11.grp9.david.tan.arcticflight.objects;
 
 import android.graphics.Bitmap;
-import android.graphics.Color;
 
 import com.mobdeve.s11.grp9.david.tan.arcticflight.R;
 import com.mobdeve.s11.grp9.david.tan.arcticflight.utils.GameObject;
@@ -10,8 +9,7 @@ import com.mobdeve.s11.grp9.david.tan.arcticflight.structs.Vector2;
 
 import java.util.ArrayList;
 
-public class Bird extends GameObject
-{
+public class Bird extends GameObject {
     // States
     public boolean IsDead;
 
@@ -22,10 +20,9 @@ public class Bird extends GameObject
     private static final int SPRITE_SIZE = 3;
     private static final int DAMAGE_BLINK_TIMES = 6;
     private final ArrayList<Bitmap> sprites = new ArrayList<Bitmap>();
-    private final ArrayList<Bitmap> hurtSprites = new ArrayList<Bitmap>();
+    private Bitmap hurtSprite;  // Single hurt sprite
     private long lastAnimationTime;
     private int currentSpriteIndex;
-    private int damageBlinkTimesLeft;
 
     /**
      * Constructs a new GameObject instance with the given position and size.
@@ -33,8 +30,7 @@ public class Bird extends GameObject
      * @param position The top-left position of the game object
      * @param size     The size of the game object
      */
-    public Bird(Vector2 position, Vector2 size)
-    {
+    public Bird(Vector2 position, Vector2 size) {
         super(position, size);
 
         // Initialize all sprites
@@ -42,7 +38,7 @@ public class Bird extends GameObject
         sprites.add(Sprite.loadSprite(R.drawable.bird_midflap));
         sprites.add(Sprite.loadSprite(R.drawable.bird_upflap));
 
-        hurtSprites.add(Sprite.loadSprite(R.drawable.bird_midflap_hurt));
+        hurtSprite = Sprite.loadSprite(R.drawable.bird_midflap_hurt);
 
         currentSpriteIndex = 0;
         sprite = sprites.get(0);
@@ -52,36 +48,31 @@ public class Bird extends GameObject
         setKinematic(false);
     }
 
-    public void applyAnimation(long frameRate)
-    {
+    public void applyAnimation(long frameRate) {
         long currentTime = System.currentTimeMillis();
         long elapsedTime = currentTime - lastAnimationTime;
 
-        if (elapsedTime >= 1000 / frameRate)
-        {
+        if (elapsedTime >= 1000 / frameRate) {
             // Change and Rotate Sprite
             currentSpriteIndex = (currentSpriteIndex + 1) % SPRITE_SIZE;
-            if (damageBlinkTimesLeft > DAMAGE_BLINK_TIMES)
-            {
-                setSprite(hurtSprites.get(0), velocity.y * -15);
-            }
-            else
-            {
-                setSprite(sprites.get(currentSpriteIndex), velocity.y * -15);
-            }
-
+            setSprite(sprites.get(currentSpriteIndex), velocity.y * -15);
             lastAnimationTime = currentTime;
         }
     }
 
-    public void flap()
-    {
-        if (position.y > 0)
-        {
+    public void flap() {
+        if (position.y > 0) {
             velocity.y = FLAP_FORCE;
         }
     }
 
+    public void showHurtSprite() {
+        setSprite(hurtSprite, velocity.y * -15);
+    }
 
+    public void onDamage() {
+        showHurtSprite();
+        IsDead = true;
+        setVelocity(new Vector2(getVelocity().x, 3.8f));
+    }
 }
-
