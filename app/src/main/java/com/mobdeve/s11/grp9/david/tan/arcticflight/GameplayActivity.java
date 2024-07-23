@@ -50,7 +50,7 @@ public class GameplayActivity extends AppCompatActivity {
         dialog.setCanceledOnTouchOutside(false);
         Window window = dialog.getWindow();
         if (window != null) {
-            window.setLayout(950, 1500);
+            window.setLayout(1100, 1500);
             window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
 
