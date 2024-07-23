@@ -314,9 +314,13 @@ public class GameScene extends GameView
             if (bird.getPosition().y > GameConstants.SCREEN_HEIGHT)
             {
                 freeze();
-                if (getContext() instanceof GameplayActivity) {
-                    ((GameplayActivity) getContext()).onGameOverHandler(score);
-                }
+                final GameplayActivity gameplayActivity = (GameplayActivity) getContext();
+                gameplayActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        gameplayActivity.showGameOverDialog(score);
+                    }
+                });
             }
         }
     }

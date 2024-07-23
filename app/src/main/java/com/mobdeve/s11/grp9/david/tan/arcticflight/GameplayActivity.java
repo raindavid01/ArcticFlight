@@ -1,11 +1,18 @@
 package com.mobdeve.s11.grp9.david.tan.arcticflight;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -38,11 +45,40 @@ public class GameplayActivity extends AppCompatActivity {
         gameScene.start();
     }
 
-    public void onGameOverHandler(int score) {
-        Intent intent = new Intent(this, GameOverActivity.class);
-        intent.putExtra("score", score);
-        startActivity(intent);
-        finish();
+    public void showGameOverDialog(int score) {
+        Dialog dialog = new Dialog(GameplayActivity.this);
+        dialog.setContentView(R.layout.gameover_popup);
+        dialog.setCanceledOnTouchOutside(false);
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setLayout(950, 1500);
+            window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        TextView scoreTextView = dialog.findViewById(R.id.score);
+        scoreTextView.setText("Score: " + score);
+
+        Button retryButton = dialog.findViewById(R.id.retryBtn);
+        retryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                gameScene.restart();
+            }
+        });
+
+        Button homeButton = dialog.findViewById(R.id.homedeathBtn);
+        homeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                Intent intent = new Intent(GameplayActivity.this, MainActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        dialog.show();
     }
 
     private void storeData()
