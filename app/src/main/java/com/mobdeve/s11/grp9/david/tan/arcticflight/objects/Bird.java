@@ -103,20 +103,6 @@ public class Bird extends GameObject
         }
     }
 
-    public void onDamage()
-    {
-        Health--;
-
-        if (Health <= 0)
-        {
-            IsDamaging = false;
-            IsDead = true;
-            return;
-        }
-
-        damageBlinkTimesLeft = DAMAGE_BLINK_TIMES + 2;
-        IsDamaging = true;
-    }
 
 }
 

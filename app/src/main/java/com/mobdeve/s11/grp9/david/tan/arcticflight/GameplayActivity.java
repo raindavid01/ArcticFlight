@@ -16,7 +16,6 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.mobdeve.s11.grp9.david.tan.arcticflight.databinding.GameoverPopupBinding;
 import com.mobdeve.s11.grp9.david.tan.arcticflight.databinding.GameplayBinding;
 import com.mobdeve.s11.grp9.david.tan.arcticflight.utils.GameConstants;
 
@@ -45,7 +44,7 @@ public class GameplayActivity extends AppCompatActivity {
         gameScene.start();
     }
 
-    public void showGameOverDialog(int score) {
+    public void showGameOverDialog(int score, int bestScore) {
         Dialog dialog = new Dialog(GameplayActivity.this);
         dialog.setContentView(R.layout.gameover_popup);
         dialog.setCanceledOnTouchOutside(false);
@@ -56,7 +55,10 @@ public class GameplayActivity extends AppCompatActivity {
         }
 
         TextView scoreTextView = dialog.findViewById(R.id.score);
-        scoreTextView.setText("Score: " + score);
+        scoreTextView.setText(String.valueOf(score));
+
+        TextView bestScoreTextView = dialog.findViewById(R.id.best_score);
+        bestScoreTextView.setText(String.valueOf(bestScore));
 
         Button retryButton = dialog.findViewById(R.id.retryBtn);
         retryButton.setOnClickListener(new View.OnClickListener() {
@@ -81,20 +83,4 @@ public class GameplayActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void storeData()
-    {
-        SharedPreferences sharedPreferences = getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        editor.putInt("record", record);
-
-        editor.apply();
-    }
-
-    private void loadData()
-    {
-        SharedPreferences sharedPreferences = getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
-
-        record = sharedPreferences.getInt("record", 0);
-    }
 }

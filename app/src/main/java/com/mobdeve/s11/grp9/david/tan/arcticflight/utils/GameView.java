@@ -20,15 +20,12 @@ import java.util.ArrayList;
 public abstract class GameView extends View
 {
     private final ArrayList<GameObject>[] AllObjects = new ArrayList[10];
-    private final ArrayList<GameEvent> AllEvents = new ArrayList();
     private final GameLogicThread logicThread;
     private final GameRenderThread renderThread;
     private final GameSoundThread soundThread;
     private Handler handler;
     private Method drawMethodGO;
     private Method physicsMethodGO;
-    private Method drawMethodE;
-    private Method physicsMethodE;
     private long lastFrameTime;
     private long frameInterval;
 
@@ -62,13 +59,9 @@ public abstract class GameView extends View
         {
             drawMethodGO = GameObject.class.getDeclaredMethod("draw", Canvas.class);
             physicsMethodGO = GameObject.class.getDeclaredMethod("physics");
-            drawMethodE = GameEvent.class.getDeclaredMethod("draw", Canvas.class);
-            physicsMethodE = GameEvent.class.getDeclaredMethod("physics");
 
             drawMethodGO.setAccessible(true);
             physicsMethodGO.setAccessible(true);
-            drawMethodE.setAccessible(true);
-            physicsMethodE.setAccessible(true);
         }
         catch (NoSuchMethodException e)
         {
@@ -99,19 +92,6 @@ public abstract class GameView extends View
                 {
                     throw new RuntimeException(e);
                 }
-            }
-        }
-
-        // Game events (always render in the very front)
-        for (GameEvent event : AllEvents)
-        {
-            try
-            {
-                drawMethodE.invoke(event, canvas);
-            }
-            catch (IllegalAccessException | InvocationTargetException e)
-            {
-                throw new RuntimeException(e);
             }
         }
     }
@@ -168,19 +148,6 @@ public abstract class GameView extends View
                 {
                     throw new RuntimeException(e);
                 }
-            }
-        }
-
-        // Game events
-        for (GameEvent event : AllEvents)
-        {
-            try
-            {
-                physicsMethodE.invoke(event);
-            }
-            catch (IllegalAccessException | InvocationTargetException e)
-            {
-                throw new RuntimeException(e);
             }
         }
     }
@@ -299,47 +266,5 @@ public abstract class GameView extends View
         }
 
         AllObjects[renderLayer].add(object);
-    }
-
-    /**
-     * Register the game event to the View.
-     *
-     * @param event The game event to be registered.
-     */
-    protected void registerEvent(@NonNull GameEvent event)
-    {
-        for (GameEvent gameEvent : AllEvents)
-        {
-            if (gameEvent.equals(event))
-            {
-                return;
-            }
-        }
-
-        event.onInit();
-        AllEvents.add(event);
-    }
-
-    /**
-     * Unregister the game object to the View.
-     *
-     * @param object The game object to be unregistered.
-     */
-    protected void unregisterObject(GameObject object)
-    {
-        for (int i = 9; i > -1; i--)
-        {
-            AllObjects[i].remove(object);
-        }
-    }
-
-    /**
-     * Unregister the game event to the View.
-     *
-     * @param event The game object to be unregistered.
-     */
-    protected void unregisterEvent(GameEvent event)
-    {
-        AllEvents.remove(event);
     }
 }

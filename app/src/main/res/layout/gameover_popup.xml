@@ -30,7 +30,7 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/score"
+                    android:id="@+id/score_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center|top"
@@ -43,7 +43,7 @@
                     android:textSize="34sp" />
 
                 <TextView
-                    android:id="@+id/scorenum"
+                    android:id="@+id/score"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -53,7 +53,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/textView3"
+                    android:id="@+id/best_score_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -66,12 +66,11 @@
                     android:textStyle="normal" />
 
                 <TextView
-                    android:id="@+id/textView4"
+                    android:id="@+id/best_score"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:fontFamily="@font/pixelated"
-                    android:text="75"
                     android:textColor="#ECF9FF"
                     android:textSize="24sp"
                     android:textStyle="bold" />

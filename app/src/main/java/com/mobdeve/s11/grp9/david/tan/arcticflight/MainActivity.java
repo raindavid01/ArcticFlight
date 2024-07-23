@@ -82,10 +82,4 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-    public void onGameOverHandler() {
-        Intent intent = new Intent(this, GameOverActivity.class);
-        startActivity(intent);
-        finish();
-    }
 }

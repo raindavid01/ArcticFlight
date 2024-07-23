@@ -2,20 +2,20 @@ package com.mobdeve.s11.grp9.david.tan.arcticflight;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
 import androidx.annotation.Nullable;
 
+import com.mobdeve.s11.grp9.david.tan.arcticflight.utils.DatabaseHelper;
 import com.mobdeve.s11.grp9.david.tan.arcticflight.utils.GameConstants;
-import com.mobdeve.s11.grp9.david.tan.arcticflight.utils.GameEvent;
 import com.mobdeve.s11.grp9.david.tan.arcticflight.utils.GameView;
 import com.mobdeve.s11.grp9.david.tan.arcticflight.objects.BackGround;
 import com.mobdeve.s11.grp9.david.tan.arcticflight.objects.BaseGround;
 import com.mobdeve.s11.grp9.david.tan.arcticflight.objects.Bird;
 import com.mobdeve.s11.grp9.david.tan.arcticflight.objects.Coin;
-import com.mobdeve.s11.grp9.david.tan.arcticflight.objects.Heart;
 import com.mobdeve.s11.grp9.david.tan.arcticflight.objects.Pipe;
 import com.mobdeve.s11.grp9.david.tan.arcticflight.objects.Timer;
 import com.mobdeve.s11.grp9.david.tan.arcticflight.structs.Vector2;
@@ -32,7 +32,6 @@ public class GameScene extends GameView
     private boolean canControl;
     private boolean isDebug;
     private long startTime;
-    private long coinRainTime;
     private long lastFrameShowTime;
     private int coinCount;
     private int timeCount;
@@ -40,17 +39,13 @@ public class GameScene extends GameView
     // Scene Game Objects
     private Bird bird;
     private Coin coin;
-    private Heart heart;
     private Timer timer;
     private Timer frameRateShower;
     private final ArrayList<BackGround> backGrounds = new ArrayList<BackGround>();
     private final ArrayList<BaseGround> baseGrounds = new ArrayList<BaseGround>();
     private final ArrayList<Pipe> pipes = new ArrayList<Pipe>();
-    private final Coin[] coinRain = new Coin[10];
     private static final float fixed_speed = 0.7f;
 
-    // Scene Game Events
-    private final ArrayList<GameEvent> gameEvents = new ArrayList<GameEvent>();
 
     public GameScene(Context context, @Nullable AttributeSet attrs)
     {
@@ -134,18 +129,7 @@ public class GameScene extends GameView
         coin.boundYRange((float) GameConstants.SCREEN_HEIGHT / 10, GameConstants.SCREEN_HEIGHT - baseGround1.getRect().height() - (float) GameConstants.SCREEN_HEIGHT / 10);
         coin.randomizeY();
 
-        // Coin Rain
-        for (int i = 0; i < coinRain.length; i ++)
-        {
-            Coin coinElement = new Coin(Vector2.Zero, Vector2.multiply(Vector2.One, 1.1f));
-            coinElement.setPosition(new Vector2((float) (i + 1) * GameConstants.SCREEN_WIDTH / (coinRain.length + 1), (float) -GameConstants.SCREEN_HEIGHT / 20));
-            coinRain[i] = coinElement;
-        }
 
-        // Heart
-        heart = new Heart(Vector2.Zero, Vector2.multiply(Vector2.One, 1.1f));
-        heart.setPosition(new Vector2((float) (GameConstants.SCREEN_WIDTH - heart.getRect().width()) / 2, GameConstants.SCREEN_HEIGHT - (float) (baseGround1.getRect().height() + heart.getRect().height()) / 2 + 25));
-        heart.setSpriteColor(Color.TRANSPARENT);
 
         // Timer and FrameRateShower
         timer = new Timer(Vector2.Zero, Vector2.multiply(Vector2.One, 1.5f));
@@ -189,24 +173,11 @@ public class GameScene extends GameView
         // Coin
         registerObject(coin, 2);
 
-        // Coin Rain
-        for (Coin coinElement : coinRain)
-        {
-            registerObject(coinElement, 2);
-        }
 
-        // Heart
-        registerObject(heart, 0);
 
         // Timer and FrameRateShower
         registerObject(timer, 0);
         registerObject(frameRateShower, 0);
-
-        ///////////////////////// Events /////////////////////////
-        for (GameEvent gameEvent : gameEvents)
-        {
-            registerEvent(gameEvent);
-        }
     }
 
     @Override
@@ -215,14 +186,6 @@ public class GameScene extends GameView
         bird.applyAnimation(16);
         coin.applyAnimation(24);
 
-        // Coin Rain
-        for (Coin coinElement : coinRain)
-        {
-            if (!coinElement.isKinematic())
-            {
-                coinElement.applyAnimation(24);
-            }
-        }
     }
 
     @Override
@@ -233,7 +196,6 @@ public class GameScene extends GameView
         {
             bird.setVelocity(new Vector2(0, bird.getVelocity().y));
             bird.setPosition(new Vector2((float) (100 * GameConstants.SCREEN_WIDTH) / 1080, bird.getPosition().y));
-            heart.setHeartHealth(bird.Health);
             timer.timerUpdate(0);
             startTime = System.currentTimeMillis();
 
@@ -253,7 +215,6 @@ public class GameScene extends GameView
         // Timer
         int elapsedTime = (int)(System.currentTimeMillis() - startTime) / 1000;
         float elapsedFrameTime = (float)(System.currentTimeMillis() - lastFrameShowTime) / 1000.0f;
-        float elapsedCoinRainTime = (float) (System.currentTimeMillis() - coinRainTime) / 1000.0f;
 
         if (canControl && elapsedTime >= 1)
         {
@@ -268,30 +229,6 @@ public class GameScene extends GameView
         {
             frameRateShower.timerUpdate((int) (1000 / GameConstants.DELTA_TIME));
             lastFrameShowTime = System.currentTimeMillis();
-        }
-
-        // Coin Rain
-        if (pipes.get(0).spriteIndex == 2 && GameConstants.DELTA_TIME != 0 && elapsedCoinRainTime >= 0.25f)
-        {
-            int randomCoinIndex = random.nextInt(coinRain.length);
-            Coin coinGet = coinRain[randomCoinIndex];
-
-            if (coinGet.isKinematic())
-            {
-                coinGet.setKinematic(false);
-            }
-
-            coinRainTime = System.currentTimeMillis();
-        }
-
-        for (Coin coinElement : coinRain)
-        {
-            if (!coinElement.isKinematic() && coinElement.getPosition().y > GameConstants.SCREEN_HEIGHT + coinElement.getRect().height())
-            {
-                coinElement.setKinematic(true);
-                coinElement.setVelocity(Vector2.Zero);
-                coinElement.setPosition(new Vector2(coinElement.getPosition().x, (float) -GameConstants.SCREEN_HEIGHT / 20));
-            }
         }
 
 
@@ -314,13 +251,6 @@ public class GameScene extends GameView
             if (bird.getPosition().y > GameConstants.SCREEN_HEIGHT)
             {
                 freeze();
-                final GameplayActivity gameplayActivity = (GameplayActivity) getContext();
-                gameplayActivity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        gameplayActivity.showGameOverDialog(score);
-                    }
-                });
             }
         }
     }
@@ -362,7 +292,6 @@ public class GameScene extends GameView
         ///////////////////////// Objects /////////////////////////
         // Bird
         bird.setPosition(new Vector2(-bird.getRawRect().width(), GameConstants.SCREEN_HEIGHT * 0.3f));
-        bird.Health = Bird.FULL_HEALTH;
         bird.IsDead = false;
 
         // BackGround
@@ -387,27 +316,11 @@ public class GameScene extends GameView
         coin.setPosition(new Vector2(pipes.get(ranIndex).getPosition().x + (float) pipes.get(0).getRect().width() / 2 + Pipe.INTERVAL / 2 - (float) coin.getRect().width() / 2, 0));
         coin.randomizeY();
 
-        // Coin Rain
-        for (Coin coinElement : coinRain)
-        {
-            coinElement.setKinematic(true);
-            coinElement.setVelocity(Vector2.Zero);
-            coinElement.setPosition(new Vector2(coinElement.getPosition().x, (float) -GameConstants.SCREEN_HEIGHT / 20));
-        }
-
-        // Heart
-        heart.setHeartHealth(Bird.FULL_HEALTH);
-        heart.setSpriteColor(Color.TRANSPARENT);
 
         // Timer and FrameRateShower
         timer.setSpriteColor(Color.TRANSPARENT);
         frameRateShower.setSpriteColor(Color.TRANSPARENT);
 
-        ///////////////////////// Events /////////////////////////
-        for (GameEvent gameEvent : gameEvents)
-        {
-            gameEvent.stop();
-        }
 
         ///////////////////////// States /////////////////////////
         isGameOver = false;
@@ -488,12 +401,8 @@ public class GameScene extends GameView
         {
             if (bird.collisionCheck(baseGround))
             {
-                if (!bird.IsDamaging)
-                {
-                    playSound(R.raw.damage_sound);
-                    bird.onDamage();
-                    heart.setHeartHealth(bird.Health);
-                }
+                playSound(R.raw.damage_sound);
+                bird.IsDead = true;
 
                 bird.setVelocity(new Vector2(bird.getVelocity().x, 3.8f));
             }
@@ -504,14 +413,11 @@ public class GameScene extends GameView
         {
             if (bird.collisionCheck(pipe))
             {
+                playSound(R.raw.damage_sound);
+                bird.IsDead = true;
 
-                if (!bird.IsDamaging)
-                {
-                    playSound(R.raw.damage_sound);
-                    bird.onDamage();
-                    heart.setHeartHealth(bird.Health);
-                }
             }
+
         }
 
         // Check Bird and Coin
@@ -521,41 +427,9 @@ public class GameScene extends GameView
             coin.setPosition(new Vector2(-coin.getRect().width(), 0));
             coinCount++;
 
-            // Two Coins Increase Health Once
-            if (coinCount % 2 == 0)
-            {
-                bird.Health++;
-                if (bird.Health > Bird.FULL_HEALTH)
-                {
-                    bird.Health = Bird.FULL_HEALTH;
-                }
-
-                heart.setHeartHealth(bird.Health);
-            }
         }
 
-        // Check Bird and Coin Rain
-        for (Coin coinElement : coinRain)
-        {
-            if (!coinElement.isKinematic() && bird.collisionCheck(coinElement))
-            {
-                playSound(R.raw.coin_sound);
-                coinElement.setPosition(new Vector2(coinElement.getPosition().x, GameConstants.SCREEN_HEIGHT + coinElement.getRect().height()));
-                coinCount++;
 
-                // Two Coins Increase Health Once
-                if (coinCount % 2 == 0)
-                {
-                    bird.Health++;
-                    if (bird.Health > Bird.FULL_HEALTH)
-                    {
-                        bird.Health = Bird.FULL_HEALTH;
-                    }
-
-                    heart.setHeartHealth(bird.Health);
-                }
-            }
-        }
     }
 
     private void reloadSpeed()
@@ -582,25 +456,21 @@ public class GameScene extends GameView
         coin.setVelocity(Vector2.multiply(Vector2.Left, fixed_speed));
     }
 
-    private void onGameOver()
-    {
+    private void onGameOver() {
         playSound(R.raw.die_sound);
         score = 5 * coinCount + 10 * timeCount;
         isGameOver = true;
 
         // Stop Scene Move
-        for (BackGround backGround : backGrounds)
-        {
+        for (BackGround backGround : backGrounds) {
             backGround.setVelocity(Vector2.Zero);
         }
 
-        for (BaseGround baseGround : baseGrounds)
-        {
+        for (BaseGround baseGround : baseGrounds) {
             baseGround.setVelocity(Vector2.Zero);
         }
 
-        for (Pipe pipe : pipes)
-        {
+        for (Pipe pipe : pipes) {
             pipe.setVelocity(Vector2.Zero);
         }
 
@@ -608,5 +478,35 @@ public class GameScene extends GameView
 
         // Start Bird Horizontal Move
         bird.setVelocity(new Vector2(fixed_speed, bird.getVelocity().y));
+
+        // Store the score, coins, and best score in the database
+        DatabaseHelper dbHelper = new DatabaseHelper(getContext());
+        int bestScore = getBestScore(dbHelper);
+        if (score > bestScore) {
+            bestScore = score;
+        }
+        dbHelper.insertStats(score, coinCount, bestScore);
+
+        // Show Game Over Dialog
+        final GameplayActivity gameplayActivity = (GameplayActivity) getContext();
+        int finalBestScore = bestScore;
+        gameplayActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                gameplayActivity.showGameOverDialog(score, finalBestScore);
+            }
+        });
     }
+
+    private int getBestScore(DatabaseHelper dbHelper) {
+        Cursor cursor = dbHelper.getStats();
+        if (cursor != null && cursor.moveToFirst()) {
+            int bestScore = cursor.getInt(cursor.getColumnIndexOrThrow("best_score"));
+            cursor.close();
+            return bestScore;
+        }
+        return 0;
+    }
+
+
 }

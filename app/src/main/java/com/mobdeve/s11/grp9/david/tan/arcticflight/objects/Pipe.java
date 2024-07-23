@@ -15,7 +15,7 @@ import java.util.Random;
 public class Pipe extends GameObject {
     // Constants
     public static final float INTERVAL = GameConstants.SCREEN_WIDTH * 0.9f;
-    public static final int GAP = (int) (GameConstants.SCREEN_HEIGHT / 3.8f);
+    public static final int GAP = (int) (GameConstants.SCREEN_HEIGHT / 3.6f);
     private static final float MOVE_PIPE_CHANCE = 0.1f;
 
     // Logic
