@@ -13,9 +13,6 @@ import java.util.ArrayList;
 public class Bird extends GameObject
 {
     // States
-    public static final int FULL_HEALTH = 10;
-    public int Health;
-    public boolean IsDamaging;
     public boolean IsDead;
 
     // Physics
@@ -51,9 +48,6 @@ public class Bird extends GameObject
         sprite = sprites.get(0);
         spriteOffset = new Vector2(-18, -10);
 
-        // Initialize States
-        Health = FULL_HEALTH;
-        IsDamaging = false;
         IsDead = false;
         setKinematic(false);
     }
@@ -74,21 +68,6 @@ public class Bird extends GameObject
             else
             {
                 setSprite(sprites.get(currentSpriteIndex), velocity.y * -15);
-            }
-
-            // Damage Blinking Effect
-            if (damageBlinkTimesLeft > 0 && (int) (lastAnimationTime / (1000 / frameRate)) % 2 == 0)
-            {
-                if (damageBlinkTimesLeft <= DAMAGE_BLINK_TIMES)
-                {
-                    setSpriteColor(Color.TRANSPARENT);
-                }
-
-                damageBlinkTimesLeft --;
-            }
-            else if (IsDamaging && damageBlinkTimesLeft <= 0)
-            {
-                IsDamaging = false;
             }
 
             lastAnimationTime = currentTime;
