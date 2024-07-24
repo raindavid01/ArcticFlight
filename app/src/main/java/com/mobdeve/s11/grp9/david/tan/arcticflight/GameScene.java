@@ -144,15 +144,20 @@ public class GameScene extends GameView {
             pipe.logicUpdate();
         }
 
-        int elapsedTime = (int) (System.currentTimeMillis() - startTime) / 1000;
-        float elapsedFrameTime = (float) (System.currentTimeMillis() - lastFrameShowTime) / 1000.0f;
-
-        if (canControl && elapsedTime >= 1) {
-            timeCount += elapsedTime;
-            startTime = System.currentTimeMillis();
-            lastFrameShowTime = System.currentTimeMillis();
-            timer.timerUpdate(timeCount);
+        // Increment pipe count when bird passes a pair of pipes
+        if (!bird.IsDead) {
+            for (int i = 0; i < pipes.size(); i += 2) {
+                Pipe upperPipe = pipes.get(i);
+                if (bird.getPosition().x > upperPipe.getPosition().x + upperPipe.getRect().width() && !upperPipe.hasPassed) {
+                    timeCount++;
+                    upperPipe.hasPassed = true;
+                    pipes.get(i + 1).hasPassed = true;
+                    timer.timerUpdate(timeCount);
+                }
+            }
         }
+
+        float elapsedFrameTime = (float) (System.currentTimeMillis() - lastFrameShowTime) / 1000.0f;
 
         if (isDebug && GameConstants.DELTA_TIME != 0 && elapsedFrameTime >= 0.5f) {
             frameRateShower.timerUpdate((int) (1000 / GameConstants.DELTA_TIME));
@@ -173,6 +178,7 @@ public class GameScene extends GameView {
             }
         }
     }
+
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -207,8 +213,10 @@ public class GameScene extends GameView {
         for (int i = 0; i < pipes.size() / 2; i++) {
             pipes.get(2 * i).setPosition(new Vector2(GameConstants.SCREEN_WIDTH + (i + 1) * Pipe.INTERVAL, 0));
             pipes.get(2 * i).randomizeY();
+            pipes.get(2 * i).reset();  // Reset the pipe's hasPassed state
             pipes.get(2 * i).toggleMovePipe(false);
             pipes.get(2 * i + 1).logicUpdate();
+            pipes.get(2 * i + 1).reset();  // Reset the pipe's hasPassed state
         }
 
         int ranIndex = random.nextInt(3) * 2;
@@ -222,6 +230,7 @@ public class GameScene extends GameView {
         canControl = false;
         coinCount = 0;
         timeCount = 0;
+        lastFrameShowTime = System.currentTimeMillis();
         reloadSpeed();
         invalidate();
     }
@@ -320,7 +329,7 @@ public class GameScene extends GameView {
 
     private void onGameOver() {
         playSound(R.raw.die_sound);
-        score = 5 * coinCount + 10 * timeCount;
+        score = timeCount;
         isGameOver = true;
 
         backGround.setVelocity(Vector2.Zero);

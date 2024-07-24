@@ -26,6 +26,7 @@ public class Pipe extends GameObject {
     public int spriteIndex;
     private final ArrayList<Bitmap> sprites = new ArrayList<>();
     private static final float fixed_speed = 0.7f;
+    public boolean hasPassed;
 
     /**
      * Constructs a new GameObject instance with the given position and size.
@@ -46,6 +47,8 @@ public class Pipe extends GameObject {
 
         sprite = sprites.get(0);
         spriteIndex = 0;
+
+        hasPassed = false;
 
         Log.d("Pipe", "Pipe initialized with " + sprites.size() + " sprite(s).");
     }
@@ -124,5 +127,9 @@ public class Pipe extends GameObject {
         }
 
         sprite = sprites.get(0); // Ensure only the existing sprite is used
+    }
+
+    public void reset() {
+        hasPassed = false;
     }
 }
