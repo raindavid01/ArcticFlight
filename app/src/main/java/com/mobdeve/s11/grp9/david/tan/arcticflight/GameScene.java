@@ -11,6 +11,7 @@ import android.view.MotionEvent;
 
 import androidx.annotation.Nullable;
 
+import com.mobdeve.s11.grp9.david.tan.arcticflight.objects.Firework;
 import com.mobdeve.s11.grp9.david.tan.arcticflight.utils.DatabaseHelper;
 import com.mobdeve.s11.grp9.david.tan.arcticflight.utils.GameConstants;
 import com.mobdeve.s11.grp9.david.tan.arcticflight.utils.GameView;
@@ -44,6 +45,8 @@ public class GameScene extends GameView {
     private Timer timer;
     private Timer frameRateShower;
     private BackGround backGround;  // Single background
+    private Firework firework1;
+    private Firework firework2;
     private final ArrayList<BaseGround> baseGrounds = new ArrayList<>();
     private final ArrayList<Pipe> pipes = new ArrayList<>();
     private static final float fixed_speed = 0.7f;
@@ -96,12 +99,16 @@ public class GameScene extends GameView {
         coin.boundYRange((float) GameConstants.SCREEN_HEIGHT / 10, GameConstants.SCREEN_HEIGHT - baseGround1.getRect().height() - (float) GameConstants.SCREEN_HEIGHT / 10);
 
         timer = new Timer(Vector2.Zero, Vector2.multiply(Vector2.One, 1.5f));
-        timer.CanGlow = true;
         timer.setAlignTopCenter(new Vector2((float) GameConstants.SCREEN_WIDTH / 2, GameConstants.SCREEN_HEIGHT * 0.1f));
 
         frameRateShower = new Timer(Vector2.Zero, Vector2.multiply(Vector2.One, 0.8f));
         frameRateShower.setDebugGreen();
         frameRateShower.setAlignTopRight(new Vector2(GameConstants.SCREEN_WIDTH, 0));
+
+        firework1 = new Firework(new Vector2((float) GameConstants.SCREEN_WIDTH/ 2 - 150, GameConstants.SCREEN_HEIGHT * 0.0f), Vector2.One);
+        firework2 = new Firework(new Vector2((float) GameConstants.SCREEN_WIDTH / 2 - 500, GameConstants.SCREEN_HEIGHT * 0.0f), Vector2.One);
+        firework1.initializeSound(getContext());
+        firework2.initializeSound(getContext());
 
         reloadSpeed();
     }
@@ -119,12 +126,17 @@ public class GameScene extends GameView {
         registerObject(coin, 2);
         registerObject(timer, 0);
         registerObject(frameRateShower, 0);
+
+        registerObject(firework1, 1);
+        registerObject(firework2, 1);
     }
 
     @Override
     public void renderUpdate() {
         bird.applyAnimation(16);
         coin.applyAnimation(24);
+        firework1.applyAnimation(16);
+        firework2.applyAnimation(16);
     }
 
     @Override
@@ -153,6 +165,21 @@ public class GameScene extends GameView {
                     upperPipe.hasPassed = true;
                     pipes.get(i + 1).hasPassed = true;
                     timer.timerUpdate(timeCount);
+
+                    // Check for milestone
+                    if (timeCount % 10 == 0) {
+                        coinCount += 10;
+                        firework1.activate();
+                        firework2.activate();
+                        // Schedule deactivation of the firework after a short delay
+                        postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                firework1.deactivate();
+                                firework2.deactivate();
+                            }
+                        }, 1500); // Firework lasts for 1.5 seconds
+                    }
                 }
             }
         }
@@ -167,7 +194,7 @@ public class GameScene extends GameView {
         cycleCheck();
 
         if (!bird.IsDead) {
-            checkCollision();
+            //checkCollision();
         } else {
             if (!isGameOver) {
                 onGameOver();
@@ -274,6 +301,8 @@ public class GameScene extends GameView {
                     pipes.get(upperPipeIndex).setPosition(new Vector2(3 * Pipe.INTERVAL - pipes.get(upperPipeIndex).getRect().width() + offset, 0f));
                     pipes.get(upperPipeIndex).randomizeY();
                     pipes.get(upperPipeIndex).randomizeToggleMove();
+                    pipes.get(upperPipeIndex).reset();  // Reset the pipe's hasPassed state
+                    pipes.get(lowerPipeIndex).reset();
                 }
 
                 pipeX = Math.max(pipes.get(upperPipeIndex).getPosition().x, pipeX);
