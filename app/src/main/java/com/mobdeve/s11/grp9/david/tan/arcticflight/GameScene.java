@@ -194,7 +194,7 @@ public class GameScene extends GameView {
         cycleCheck();
 
         if (!bird.IsDead) {
-            //checkCollision();
+            checkCollision();
         } else {
             if (!isGameOver) {
                 onGameOver();
