@@ -6,6 +6,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
@@ -34,7 +35,6 @@ public class GameScene extends GameView {
     private boolean isGameOver;
     private boolean canControl;
     private boolean isDebug;
-    private long startTime;
     private long lastFrameShowTime;
     private int coinCount;
     private int timeCount;
@@ -51,6 +51,11 @@ public class GameScene extends GameView {
     private final ArrayList<Pipe> pipes = new ArrayList<>();
     private static final float fixed_speed = 0.7f;
 
+    // MediaPlayer for gameplay audio
+    private MediaPlayer gameplayMediaPlayer;
+    // MediaPlayer for game over audio
+    private MediaPlayer gameOverMediaPlayer;
+
     public GameScene(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
@@ -60,6 +65,11 @@ public class GameScene extends GameView {
         isDebug = false;
         coinCount = 0;
         timeCount = 0;
+
+        // Initialize and start the MediaPlayer for gameplay audio
+        gameplayMediaPlayer = MediaPlayer.create(context, R.raw.gameplay);
+        gameplayMediaPlayer.setLooping(true);
+        gameplayMediaPlayer.start();
     }
 
     @Override
@@ -145,7 +155,6 @@ public class GameScene extends GameView {
             bird.setVelocity(new Vector2(0, bird.getVelocity().y));
             bird.setPosition(new Vector2((float) (100 * GameConstants.SCREEN_WIDTH) / 1080, bird.getPosition().y));
             timer.timerUpdate(0);
-            startTime = System.currentTimeMillis();
             canControl = true;
         } else if (!canControl && bird.getPosition().y > GameConstants.SCREEN_HEIGHT * 0.45f) {
             playSound(R.raw.flap_sound);
@@ -206,7 +215,6 @@ public class GameScene extends GameView {
         }
     }
 
-
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -260,6 +268,12 @@ public class GameScene extends GameView {
         lastFrameShowTime = System.currentTimeMillis();
         reloadSpeed();
         invalidate();
+
+        if (gameplayMediaPlayer == null) {
+            gameplayMediaPlayer = MediaPlayer.create(getContext(), R.raw.gameplay);
+            gameplayMediaPlayer.setLooping(true);
+            gameplayMediaPlayer.start();
+        }
     }
 
     public void restart() {
@@ -270,10 +284,6 @@ public class GameScene extends GameView {
         score = 0;
         reloadSpeed();
         unfreeze();
-    }
-
-    public void toggleDebugFrame() {
-        isDebug = !isDebug;
     }
 
     private void cycleCheck() {
@@ -338,7 +348,6 @@ public class GameScene extends GameView {
         }
     }
 
-
     private void reloadSpeed() {
         bird.setVelocity(Vector2.multiply(Vector2.Right, fixed_speed / 5));
 
@@ -375,6 +384,26 @@ public class GameScene extends GameView {
 
         bird.setVelocity(new Vector2(fixed_speed, bird.getVelocity().y));
 
+        // Stop the gameplay audio
+        if (gameplayMediaPlayer != null && gameplayMediaPlayer.isPlaying()) {
+            gameplayMediaPlayer.stop();
+            gameplayMediaPlayer.release();
+            gameplayMediaPlayer = null;
+        }
+
+        // Initialize and start the MediaPlayer for game over audio
+        gameOverMediaPlayer = MediaPlayer.create(getContext(), R.raw.game_over);
+        gameOverMediaPlayer.start();
+
+        // Release the MediaPlayer when the audio finishes playing
+        gameOverMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                mp.release();
+                gameOverMediaPlayer = null;
+            }
+        });
+
         DatabaseHelper dbHelper = new DatabaseHelper(getContext());
         int bestScore = getBestScore(dbHelper);
         if (score > bestScore) {
@@ -401,6 +430,18 @@ public class GameScene extends GameView {
         }
         return 0;
     }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        // Release the MediaPlayer when the view is detached to avoid memory leaks
+        if (gameplayMediaPlayer != null) {
+            gameplayMediaPlayer.release();
+            gameplayMediaPlayer = null;
+        }
+        if (gameOverMediaPlayer != null) {
+            gameOverMediaPlayer.release();
+            gameOverMediaPlayer = null;
+        }
+    }
 }
-
-
