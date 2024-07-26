@@ -23,4 +23,15 @@ public class BackGround extends GameObject
         // Initialize Sprite
         themeSprites.add(Sprite.loadSprite(R.drawable.background));
     }
+
+    public void cleanup() {
+        // Recycle and nullify bitmaps
+        for (Bitmap themeSprite : themeSprites) {
+            if (themeSprite != null) {
+                themeSprite.recycle();
+            }
+        }
+        themeSprites.clear();
+    }
+
 }

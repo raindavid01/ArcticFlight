@@ -81,4 +81,21 @@ public class Firework extends GameObject {
             mediaPlayer.seekTo(0);
         }
     }
+
+    public void cleanup() {
+        // Recycle and nullify bitmaps
+        for (Bitmap sprite : sprites) {
+            if (sprite != null) {
+                sprite.recycle();
+            }
+        }
+        sprites.clear();
+
+        // Release the MediaPlayer
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+    }
+
 }

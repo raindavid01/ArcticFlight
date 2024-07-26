@@ -132,4 +132,15 @@ public class Pipe extends GameObject {
     public void reset() {
         hasPassed = false;
     }
+
+    public void cleanup() {
+        // Recycle and nullify bitmaps
+        for (Bitmap sprite : sprites) {
+            if (sprite != null) {
+                sprite.recycle();
+            }
+        }
+        sprites.clear();
+    }
+
 }

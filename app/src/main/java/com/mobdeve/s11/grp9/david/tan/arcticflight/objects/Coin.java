@@ -78,4 +78,14 @@ public class Coin extends GameObject
 
         position.y = this.range[0] + randomValue * range;
     }
+
+    public void cleanup() {
+        // Recycle and nullify bitmaps
+        for (Bitmap sprite : sprites) {
+            if (sprite != null) {
+                sprite.recycle();
+            }
+        }
+        sprites.clear();
+    }
 }

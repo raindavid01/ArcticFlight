@@ -14,9 +14,11 @@ import android.media.MediaPlayer;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
 
+import com.mobdeve.s11.grp9.david.tan.arcticflight.objects.CoinDisplay;
 import com.mobdeve.s11.grp9.david.tan.arcticflight.objects.Firework;
 import com.mobdeve.s11.grp9.david.tan.arcticflight.utils.DatabaseHelper;
 import com.mobdeve.s11.grp9.david.tan.arcticflight.utils.GameConstants;
@@ -57,8 +59,7 @@ public class GameScene extends GameView {
     private final ArrayList<BaseGround> baseGrounds = new ArrayList<>();
     private final ArrayList<Pipe> pipes = new ArrayList<>();
     private static final float fixed_speed = 0.7f;
-    private Paint coinCountPaint;
-    private Bitmap coinIcon;
+    private CoinDisplay coinDisplay;
 
     // MediaPlayer for gameplay audio
     private MediaPlayer gameplayMediaPlayer;
@@ -135,30 +136,13 @@ public class GameScene extends GameView {
         firework2 = new Firework(new Vector2((float) GameConstants.SCREEN_WIDTH / 2 - 500, GameConstants.SCREEN_HEIGHT * 0.0f), Vector2.One);
         firework1.initializeSound(getContext());
         firework2.initializeSound(getContext());
+        // Adjust size as necessary
+        coinDisplay = new CoinDisplay(getContext(), Vector2.Zero, Vector2.multiply(Vector2.One, 1.1f), totalCoins);
 
-        //display coins
-        coinCountPaint = new Paint();
-        coinCountPaint.setColor(Color.parseColor("#18284a"));
-        coinCountPaint.setTextSize(75);
-        coinCountPaint.setTypeface(ResourcesCompat.getFont(getContext(), R.font.pixelated));
-        coinIcon = BitmapFactory.decodeResource(getResources(), R.drawable.coin1);
 
         reloadSpeed();
     }
 
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-
-        int iconX = 20;
-        int iconY = 40;
-        int textX = iconX + coinIcon.getWidth() + 10;
-        int textY = iconY + coinIcon.getHeight() / 2 + 20;
-
-        // Draw the coin count at the top right corner of the screen
-        canvas.drawBitmap(coinIcon, iconX, iconY, null);
-        canvas.drawText(totalCoins + " Coins" , textX, textY, coinCountPaint);
-    }
 
     @Override
     protected void onRegistration() {
@@ -176,6 +160,8 @@ public class GameScene extends GameView {
 
         registerObject(firework1, 1);
         registerObject(firework2, 1);
+
+        registerObject(coinDisplay, 1);
     }
 
     @Override
@@ -387,6 +373,7 @@ public class GameScene extends GameView {
             coin.setPosition(new Vector2(-coin.getRect().width(), 0));
             coinCount++;
             totalCoins++;
+            coinDisplay.setCoinCount(totalCoins);
             invalidate();
         }
     }
@@ -487,9 +474,65 @@ public class GameScene extends GameView {
             gameOverMediaPlayer.release();
             gameOverMediaPlayer = null;
         }
-        if (coinIcon != null) {
-            coinIcon.recycle();
-            coinIcon = null;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Release the MediaPlayer resources
+        if (gameplayMediaPlayer != null) {
+            gameplayMediaPlayer.release();
+            gameplayMediaPlayer = null;
+        }
+        if (gameOverMediaPlayer != null) {
+            gameOverMediaPlayer.release();
+            gameOverMediaPlayer = null;
+        }
+        // Clean up other resources
+        if (dbHelper != null) {
+            dbHelper.close();
+            dbHelper = null;
+        }
+        if (bird != null) {
+            bird.cleanup();
+            bird = null;
+        }
+        if (coin != null) {
+            coin.cleanup();
+            coin = null;
+        }
+        if (timer != null) {
+            timer.cleanup();
+            timer = null;
+        }
+        if (frameRateShower != null) {
+            frameRateShower.cleanup();
+            frameRateShower = null;
+        }
+        if (backGround != null) {
+            backGround.cleanup();
+            backGround = null;
+        }
+        if (firework1 != null) {
+            firework1.cleanup();
+            firework1 = null;
+        }
+        if (firework2 != null) {
+            firework2.cleanup();
+            firework2 = null;
+        }
+        for (BaseGround baseGround : baseGrounds) {
+            baseGround.cleanup();
+        }
+        baseGrounds.clear();
+        for (Pipe pipe : pipes) {
+            pipe.cleanup();
+        }
+        pipes.clear();
+
+        if (coinDisplay != null) {
+            coinDisplay.cleanup();
         }
     }
+
 }

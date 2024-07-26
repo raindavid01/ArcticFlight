@@ -136,5 +136,16 @@ public class Timer extends GameObject
     {
         numSprites.replaceAll(sprite -> Sprite.colorSprite(sprite, Color.GREEN));
     }
+
+    public void cleanup() {
+        // Recycle and nullify bitmaps
+        for (Bitmap numSprite : numSprites) {
+            if (numSprite != null) {
+                numSprite.recycle();
+            }
+        }
+        numSprites.clear();
+    }
+
 }
 

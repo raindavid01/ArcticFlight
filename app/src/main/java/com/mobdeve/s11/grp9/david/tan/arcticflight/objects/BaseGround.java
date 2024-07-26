@@ -20,4 +20,13 @@ public class BaseGround extends GameObject
         // Initialize  Sprite
         sprite = Sprite.loadSprite(R.drawable.base);
     }
+
+    public void cleanup() {
+        // Recycle and nullify the sprite
+        if (sprite != null) {
+            sprite.recycle();
+            sprite = null;
+        }
+    }
+
 }

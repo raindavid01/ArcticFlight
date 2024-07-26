@@ -1,12 +1,10 @@
 package com.mobdeve.s11.grp9.david.tan.arcticflight;
 
 import android.app.Dialog;
-import android.view.Window;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -26,20 +24,20 @@ public class ShopActivity extends AppCompatActivity {
     private TextView tvTotalCoins;
     private DatabaseHelper dbHelper;
 
-    int []arr={R.drawable.santa,R.drawable.tophat,R.drawable.cap};
+    int[] arr = {R.drawable.santa, R.drawable.tophat, R.drawable.cap};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.shop);
         recyclerView = findViewById(R.id.recyclerView);
-        tvTotalCoins = findViewById(R.id.coinTv); //
+        tvTotalCoins = findViewById(R.id.coinTv);
 
         dbHelper = new DatabaseHelper(this);
 
         layoutManager = new GridLayoutManager(getApplicationContext(), 3);
         recyclerView.setLayoutManager(layoutManager);
-        myAdapter = new MyAdapter(arr);
+        myAdapter = new MyAdapter(this, arr);
         recyclerView.setAdapter(myAdapter);
         recyclerView.setHasFixedSize(true);
 
@@ -65,5 +63,25 @@ public class ShopActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         updateCoinDisplay();  // Update coins every time the activity resumes
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Clean up resources
+        if (dbHelper != null) {
+            dbHelper.close();
+            dbHelper = null;
+        }
+        if (recyclerView != null) {
+            recyclerView.setAdapter(null);
+        }
+        if (myAdapter != null) {
+            myAdapter.cleanup();
+            myAdapter = null;
+        }
+        layoutManager = null;
+        recyclerView = null;
+        tvTotalCoins = null;
     }
 }

@@ -1,39 +1,44 @@
 package com.mobdeve.s11.grp9.david.tan.arcticflight;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
-    int []arr;
+    private int[] arr;
+    private Context context;
 
-    public MyAdapter(int[] arr) {
+    public MyAdapter(Context context, int[] arr) {
+        this.context = context;
         this.arr = arr;
     }
 
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.shop_item,parent,false);
-        MyViewHolder myViewHolder = new MyViewHolder(view);
-        return myViewHolder;
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.shop_item, parent, false);
+        return new MyViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+        // Scale down the bitmap
+        Bitmap originalBitmap = BitmapFactory.decodeResource(context.getResources(), arr[position]);
+        Bitmap scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, originalBitmap.getWidth() / 2, originalBitmap.getHeight() / 2, true);
 
-        holder.hatIv.setImageResource(arr[position]);
-        //holder.buyBtn
+        holder.hatIv.setImageBitmap(scaledBitmap);
+
+        // Button click listener
         Button buyBtn = holder.itemView.findViewById(R.id.buyBtn);
-
         buyBtn.setOnClickListener(v -> {
             buyBtn.setBackgroundResource(R.drawable.ownbtn);
         });
@@ -44,16 +49,16 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         return arr.length;
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder {
+    public void cleanup() {
+        // Cleanup resources if necessary
+    }
 
+    public static class MyViewHolder extends RecyclerView.ViewHolder {
         ImageView hatIv;
-        //Button buyBtn;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
-            hatIv=itemView.findViewById(R.id.hatIv);
-            //buyBtn=itemView.findViewById(R.id.buyBtn);
-
+            hatIv = itemView.findViewById(R.id.hatIv);
         }
     }
 }

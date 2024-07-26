@@ -267,4 +267,31 @@ public abstract class GameView extends View
 
         AllObjects[renderLayer].add(object);
     }
+
+    protected void onDestroy() {
+        super.onDetachedFromWindow();
+
+        // Stop threads to avoid memory leaks
+        if (renderThread != null) {
+            renderThread.stop();
+        }
+        if (logicThread != null) {
+            logicThread.stop();
+        }
+        if (soundThread != null) {
+            soundThread.stopAllMusic();
+            soundThread.stop();
+        }
+
+        // Clear all game objects
+        for (ArrayList<GameObject> layer : AllObjects) {
+            layer.clear();
+        }
+
+        // Nullify handlers and methods to allow garbage collection
+        handler = null;
+        drawMethodGO = null;
+        physicsMethodGO = null;
+    }
+
 }

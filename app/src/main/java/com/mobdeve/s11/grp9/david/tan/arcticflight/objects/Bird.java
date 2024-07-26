@@ -75,4 +75,19 @@ public class Bird extends GameObject {
         IsDead = true;
         setVelocity(new Vector2(getVelocity().x, 3.8f));
     }
+
+    public void cleanup() {
+        // Recycle and nullify bitmaps
+        for (Bitmap sprite : sprites) {
+            if (sprite != null) {
+                sprite.recycle();
+            }
+        }
+        sprites.clear();
+
+        if (hurtSprite != null) {
+            hurtSprite.recycle();
+            hurtSprite = null;
+        }
+    }
 }
