@@ -43,4 +43,9 @@ public class GameConstants
 
     public static float MAX_FALL_SPEED = 3.5f;
 
+    public static class DIFFICULTY {
+        public static final float one = 0.55f;
+        public static final float two = 0.7f;
+        public static final float three = 0.85f;
+    }
 }

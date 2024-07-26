@@ -4,32 +4,19 @@ import static com.mobdeve.s11.grp9.david.tan.arcticflight.objects.Pipe.GAP;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.media.MediaPlayer;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.res.ResourcesCompat;
 
-import com.mobdeve.s11.grp9.david.tan.arcticflight.objects.CoinDisplay;
-import com.mobdeve.s11.grp9.david.tan.arcticflight.objects.Firework;
-import com.mobdeve.s11.grp9.david.tan.arcticflight.utils.DatabaseHelper;
-import com.mobdeve.s11.grp9.david.tan.arcticflight.utils.GameConstants;
-import com.mobdeve.s11.grp9.david.tan.arcticflight.utils.GameView;
-import com.mobdeve.s11.grp9.david.tan.arcticflight.objects.BackGround;
-import com.mobdeve.s11.grp9.david.tan.arcticflight.objects.BaseGround;
-import com.mobdeve.s11.grp9.david.tan.arcticflight.objects.Bird;
-import com.mobdeve.s11.grp9.david.tan.arcticflight.objects.Coin;
-import com.mobdeve.s11.grp9.david.tan.arcticflight.objects.Pipe;
-import com.mobdeve.s11.grp9.david.tan.arcticflight.objects.Timer;
+import com.mobdeve.s11.grp9.david.tan.arcticflight.objects.*;
 import com.mobdeve.s11.grp9.david.tan.arcticflight.structs.Vector2;
+import com.mobdeve.s11.grp9.david.tan.arcticflight.utils.*;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -47,7 +34,6 @@ public class GameScene extends GameView {
     private int totalCoins;
     private int timeCount;
 
-
     // Scene Game Objects
     private Bird bird;
     private Coin coin;
@@ -58,7 +44,7 @@ public class GameScene extends GameView {
     private Firework firework2;
     private final ArrayList<BaseGround> baseGrounds = new ArrayList<>();
     private final ArrayList<Pipe> pipes = new ArrayList<>();
-    private static final float fixed_speed = 0.7f;
+    private float speed;
     private CoinDisplay coinDisplay;
 
     // MediaPlayer for gameplay audio
@@ -66,6 +52,7 @@ public class GameScene extends GameView {
     // MediaPlayer for game over audio
     private MediaPlayer gameOverMediaPlayer;
     private DatabaseHelper dbHelper;
+    private SharedPreferences sharedPreferences;
 
     public GameScene(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -81,11 +68,13 @@ public class GameScene extends GameView {
         dbHelper = new DatabaseHelper(getContext());
         totalCoins = dbHelper.getTotalCoins(); // Load coins only for a new game
 
-
         // Initialize and start the MediaPlayer for gameplay audio
         gameplayMediaPlayer = MediaPlayer.create(context, R.raw.gameplay);
         gameplayMediaPlayer.setLooping(true);
         gameplayMediaPlayer.start();
+
+        // Initialize SharedPreferences
+        sharedPreferences = context.getSharedPreferences("GameSettings", Context.MODE_PRIVATE);
     }
 
     @Override
@@ -132,17 +121,15 @@ public class GameScene extends GameView {
         frameRateShower.setDebugGreen();
         frameRateShower.setAlignTopRight(new Vector2(GameConstants.SCREEN_WIDTH, 0));
 
-        firework1 = new Firework(new Vector2((float) GameConstants.SCREEN_WIDTH/ 2 - 150, GameConstants.SCREEN_HEIGHT * 0.0f), Vector2.One);
+        firework1 = new Firework(new Vector2((float) GameConstants.SCREEN_WIDTH / 2 - 150, GameConstants.SCREEN_HEIGHT * 0.0f), Vector2.One);
         firework2 = new Firework(new Vector2((float) GameConstants.SCREEN_WIDTH / 2 - 500, GameConstants.SCREEN_HEIGHT * 0.0f), Vector2.One);
         firework1.initializeSound(getContext());
         firework2.initializeSound(getContext());
         // Adjust size as necessary
         coinDisplay = new CoinDisplay(getContext(), Vector2.Zero, Vector2.multiply(Vector2.One, 1.1f), totalCoins);
 
-
         reloadSpeed();
     }
-
 
     @Override
     protected void onRegistration() {
@@ -171,7 +158,6 @@ public class GameScene extends GameView {
         firework1.applyAnimation(16);
         firework2.applyAnimation(16);
     }
-
 
     @Override
     public void logicUpdate() {
@@ -202,16 +188,13 @@ public class GameScene extends GameView {
                     // Check for milestone
                     if (timeCount % 10 == 0) {
                         coinCount += 10;
-                        totalCoins+= 10;
+                        totalCoins += 10;
                         firework1.activate();
                         firework2.activate();
                         // Schedule deactivation of the firework after a short delay
-                        postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                firework1.deactivate();
-                                firework2.deactivate();
-                            }
+                        postDelayed(() -> {
+                            firework1.deactivate();
+                            firework2.deactivate();
                         }, 1500); // Firework lasts for 1.5 seconds
                     }
                 }
@@ -228,7 +211,7 @@ public class GameScene extends GameView {
         cycleCheck();
 
         if (!bird.IsDead) {
-            checkCollision(); //todo: comment out if want to debug
+            checkCollision(); // todo: comment out if want to debug
         } else {
             if (!isGameOver) {
                 onGameOver();
@@ -294,7 +277,7 @@ public class GameScene extends GameView {
         lastFrameShowTime = System.currentTimeMillis();
         reloadSpeed();
         invalidate();
-        //dbHelper = new DatabaseHelper(getContext());
+        // dbHelper = new DatabaseHelper(getContext());
 
         if (gameplayMediaPlayer == null) {
             gameplayMediaPlayer = MediaPlayer.create(getContext(), R.raw.gameplay);
@@ -379,20 +362,25 @@ public class GameScene extends GameView {
     }
 
     private void reloadSpeed() {
-        bird.setVelocity(Vector2.multiply(Vector2.Right, fixed_speed / 5));
+        // Load the selected speed from SharedPreferences
+        speed = sharedPreferences.getFloat("selectedSpeed", GameConstants.DIFFICULTY.two);
 
-        backGround.setVelocity(Vector2.multiply(Vector2.Left, fixed_speed / 12));
+        Log.d("GameScene", "Selected Speed: " + speed);
+
+        bird.setVelocity(Vector2.multiply(Vector2.Right, speed / 5));
+
+        backGround.setVelocity(Vector2.multiply(Vector2.Left, speed / 12));
 
         for (BaseGround baseGround : baseGrounds) {
-            baseGround.setVelocity(Vector2.multiply(Vector2.Left, fixed_speed));
+            baseGround.setVelocity(Vector2.multiply(Vector2.Left, speed));
         }
 
         for (int i = 0; i < pipes.size() / 2; i++) {
-            pipes.get(2 * i).setVelocity(Vector2.multiply(Vector2.Left, fixed_speed));
+            pipes.get(2 * i).setVelocity(Vector2.multiply(Vector2.Left, speed));
             pipes.get(2 * i + 1).logicUpdate();
         }
 
-        coin.setVelocity(Vector2.multiply(Vector2.Left, fixed_speed));
+        coin.setVelocity(Vector2.multiply(Vector2.Left, speed));
     }
 
     private void onGameOver() {
@@ -412,7 +400,7 @@ public class GameScene extends GameView {
 
         coin.setVelocity(Vector2.Zero);
 
-        bird.setVelocity(new Vector2(fixed_speed, bird.getVelocity().y));
+        bird.setVelocity(new Vector2(speed, bird.getVelocity().y));
 
         // Stop the gameplay audio
         if (gameplayMediaPlayer != null && gameplayMediaPlayer.isPlaying()) {
@@ -426,12 +414,9 @@ public class GameScene extends GameView {
         gameOverMediaPlayer.start();
 
         // Release the MediaPlayer when the audio finishes playing
-        gameOverMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                mp.release();
-                gameOverMediaPlayer = null;
-            }
+        gameOverMediaPlayer.setOnCompletionListener(mp -> {
+            mp.release();
+            gameOverMediaPlayer = null;
         });
 
         DatabaseHelper dbHelper = new DatabaseHelper(getContext());
@@ -443,14 +428,8 @@ public class GameScene extends GameView {
 
         final GameplayActivity gameplayActivity = (GameplayActivity) getContext();
         int finalBestScore = bestScore;
-        gameplayActivity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                gameplayActivity.showGameOverDialog(score, finalBestScore);
-            }
-        });
+        gameplayActivity.runOnUiThread(() -> gameplayActivity.showGameOverDialog(score, finalBestScore));
     }
-
 
     private int getBestScore(DatabaseHelper dbHelper) {
         Cursor cursor = dbHelper.getStats();
@@ -532,5 +511,4 @@ public class GameScene extends GameView {
             coinDisplay.cleanup();
         }
     }
-
 }
