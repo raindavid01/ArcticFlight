@@ -4,17 +4,19 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.mobdeve.s11.grp9.david.tan.arcticflight.databinding.HomeBinding;
-import com.mobdeve.s11.grp9.david.tan.arcticflight.utils.DatabaseHelper;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.mobdeve.s11.grp9.david.tan.arcticflight.utils.DatabaseHelper;
+
+import java.io.IOException;
 
 public class ShopActivity extends AppCompatActivity {
 
@@ -23,6 +25,7 @@ public class ShopActivity extends AppCompatActivity {
     MyAdapter myAdapter;
     private TextView tvTotalCoins;
     private DatabaseHelper dbHelper;
+    private MediaPlayer mediaPlayer;
 
     int[] arr = {R.drawable.santa, R.drawable.tophat, R.drawable.cap};
 
@@ -42,6 +45,12 @@ public class ShopActivity extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
 
         updateCoinDisplay();
+
+        // Initialize and start the media player
+        mediaPlayer = MediaPlayer.create(this, R.raw.shop);
+        mediaPlayer.setLooping(true);
+        mediaPlayer.start(); mediaPlayer.start();
+
 
         Button shopbackBtn = findViewById(R.id.shopbackBtn);
         shopbackBtn.setOnClickListener(new View.OnClickListener() {
@@ -63,6 +72,18 @@ public class ShopActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         updateCoinDisplay();  // Update coins every time the activity resumes
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Stop and release the media player when the activity is paused
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
     }
 
     @Override
@@ -83,5 +104,11 @@ public class ShopActivity extends AppCompatActivity {
         layoutManager = null;
         recyclerView = null;
         tvTotalCoins = null;
+
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
     }
 }

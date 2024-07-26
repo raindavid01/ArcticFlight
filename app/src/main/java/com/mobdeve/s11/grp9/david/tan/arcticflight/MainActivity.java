@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         binding.playBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                stop_music();
+                stopMusic();
                 Log.d("MainActivity", "Play button clicked");
                 Intent intent = new Intent(MainActivity.this, GameplayActivity.class);
                 startActivity(intent);
@@ -53,8 +53,9 @@ public class MainActivity extends AppCompatActivity {
         binding.shopBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                stopMusic();
                 Log.d("MainActivity", "Shop button clicked");
-                Intent intent = new Intent(MainActivity.this, ShopActivity.class); // Ensure ShopActivity.class exists
+                Intent intent = new Intent(MainActivity.this, ShopActivity.class);
                 startActivity(intent);
                 finish();
             }
@@ -69,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void stop_music() {
+    private void stopMusic() {
         if (mediaPlayer != null) {
             if (mediaPlayer.isPlaying()) {
                 mediaPlayer.stop();
@@ -102,7 +103,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -117,6 +117,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        stop_music();
+        stopMusic();
+        cleanup();
+    }
+
+    private void cleanup() {
+        if (binding != null) {
+            binding = null;
+        }
     }
 }

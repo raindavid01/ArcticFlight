@@ -476,9 +476,7 @@ public class GameScene extends GameView {
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void cleanup() {
         // Release the MediaPlayer resources
         if (gameplayMediaPlayer != null) {
             gameplayMediaPlayer.release();

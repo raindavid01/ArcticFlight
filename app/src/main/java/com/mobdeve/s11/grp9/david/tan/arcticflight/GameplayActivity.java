@@ -80,4 +80,19 @@ public class GameplayActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        cleanup();
+    }
+
+    private void cleanup() {
+        if (binding != null) {
+            binding = null;
+        }
+        if (gameScene != null) {
+            gameScene.cleanup();
+            gameScene = null;
+        }
+    }
 }
