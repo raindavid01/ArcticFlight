@@ -10,7 +10,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Typeface;
 import android.media.MediaPlayer;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -43,6 +42,7 @@ public class GameScene extends GameView {
     private boolean isDebug;
     private long lastFrameShowTime;
     private int coinCount;
+    private int totalCoins;
     private int timeCount;
 
 
@@ -73,11 +73,12 @@ public class GameScene extends GameView {
         isGameOver = false;
         canControl = false;
         isDebug = false;
+        coinCount = 0;
         timeCount = 0;
 
         // Load total coins collected from the database
         dbHelper = new DatabaseHelper(getContext());
-        coinCount = dbHelper.getTotalCoins(); // Load coins only for a new game
+        totalCoins = dbHelper.getTotalCoins(); // Load coins only for a new game
 
 
         // Initialize and start the MediaPlayer for gameplay audio
@@ -156,7 +157,7 @@ public class GameScene extends GameView {
 
         // Draw the coin count at the top right corner of the screen
         canvas.drawBitmap(coinIcon, iconX, iconY, null);
-        canvas.drawText(coinCount + " Coins" , textX, textY, coinCountPaint);
+        canvas.drawText(totalCoins + " Coins" , textX, textY, coinCountPaint);
     }
 
     @Override
@@ -215,6 +216,7 @@ public class GameScene extends GameView {
                     // Check for milestone
                     if (timeCount % 10 == 0) {
                         coinCount += 10;
+                        totalCoins+= 10;
                         firework1.activate();
                         firework2.activate();
                         // Schedule deactivation of the firework after a short delay
@@ -300,7 +302,8 @@ public class GameScene extends GameView {
 
         isGameOver = false;
         canControl = false;
-        //coinCount = dbHelper.getTotalCoins();
+        coinCount = 0;
+        totalCoins = dbHelper.getTotalCoins();
         timeCount = 0;
         lastFrameShowTime = System.currentTimeMillis();
         reloadSpeed();
@@ -383,6 +386,7 @@ public class GameScene extends GameView {
             playSound(R.raw.coin_sound);
             coin.setPosition(new Vector2(-coin.getRect().width(), 0));
             coinCount++;
+            totalCoins++;
             invalidate();
         }
     }
