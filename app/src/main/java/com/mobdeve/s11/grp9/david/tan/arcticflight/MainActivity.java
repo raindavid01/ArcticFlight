@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("MainActivity", "Shop button clicked");
                 Intent intent = new Intent(MainActivity.this, ShopActivity.class); // Ensure ShopActivity.class exists
                 startActivity(intent);
+                finish();
             }
         });
 
