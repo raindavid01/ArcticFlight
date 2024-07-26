@@ -21,6 +21,9 @@
         <activity android:name=".ShopActivity">
         </activity>
 
+        <activity android:name=".SettingsActivity"
+            android:theme="@style/Theme.Transparent"/>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

@@ -14,6 +14,8 @@ import android.view.WindowManager;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+
 import com.mobdeve.s11.grp9.david.tan.arcticflight.databinding.HomeBinding;
 import com.mobdeve.s11.grp9.david.tan.arcticflight.utils.GameConstants;
 
@@ -65,9 +67,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.d("MainActivity", "Settings button clicked");
-                showDialogSettingsPopup();
+                blurBackground();
+                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(intent);
             }
         });
+    }
+
+    private void blurBackground() {
+        ConstraintLayout mainLayout = findViewById(R.id.home_layout);
+        mainLayout.setAlpha(0.5f);  // Reduce the alpha value to create a blurred effect
     }
 
     private void stopMusic() {
@@ -80,28 +89,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void showDialogSettingsPopup() {
-        Dialog dialog = new Dialog(MainActivity.this);
-        dialog.setContentView(R.layout.settings);
-        dialog.setCanceledOnTouchOutside(false);
-        Window window = dialog.getWindow();
-        if (window != null) {
-            window.setLayout(850, 1100);
-            window.setBackgroundDrawableResource(R.drawable.rounded_corners);
-            window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        }
-        dialog.show();
 
-        Button backBtn = dialog.findViewById(R.id.shopbackBtn);
-
-        backBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-                Log.d("MainActivity", "Back button clicked");
-            }
-        });
-    }
 
     @Override
     protected void onResume() {
@@ -111,6 +99,11 @@ public class MainActivity extends AppCompatActivity {
             mediaPlayer = MediaPlayer.create(this, R.raw.home_screen);
             mediaPlayer.setLooping(true);
             mediaPlayer.start();
+        }
+
+        ConstraintLayout mainLayout = findViewById(R.id.home_layout);
+        if (mainLayout != null) {
+            mainLayout.setAlpha(1.0f);
         }
     }
 
