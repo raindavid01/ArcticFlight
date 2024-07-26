@@ -51,5 +51,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("SELECT * FROM " + TABLE_NAME + " ORDER BY " + COLUMN_ID + " DESC LIMIT 1", null);
     }
+
+    public int getTotalCoins() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT SUM(" + COLUMN_COINS + ") FROM " + TABLE_NAME, null);
+        int totalCoins = 0;
+        if (cursor.moveToFirst()) {
+            totalCoins = cursor.getInt(0); // Get the sum of coins from the first column of the result
+        }
+        cursor.close();
+        return totalCoins;
+    }
+
 }
 

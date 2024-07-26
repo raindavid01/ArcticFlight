@@ -5,12 +5,18 @@ import static com.mobdeve.s11.grp9.david.tan.arcticflight.objects.Pipe.GAP;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.media.MediaPlayer;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.mobdeve.s11.grp9.david.tan.arcticflight.objects.Firework;
 import com.mobdeve.s11.grp9.david.tan.arcticflight.utils.DatabaseHelper;
@@ -39,6 +45,7 @@ public class GameScene extends GameView {
     private int coinCount;
     private int timeCount;
 
+
     // Scene Game Objects
     private Bird bird;
     private Coin coin;
@@ -50,11 +57,14 @@ public class GameScene extends GameView {
     private final ArrayList<BaseGround> baseGrounds = new ArrayList<>();
     private final ArrayList<Pipe> pipes = new ArrayList<>();
     private static final float fixed_speed = 0.7f;
+    private Paint coinCountPaint;
+    private Bitmap coinIcon;
 
     // MediaPlayer for gameplay audio
     private MediaPlayer gameplayMediaPlayer;
     // MediaPlayer for game over audio
     private MediaPlayer gameOverMediaPlayer;
+    private DatabaseHelper dbHelper;
 
     public GameScene(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -63,8 +73,12 @@ public class GameScene extends GameView {
         isGameOver = false;
         canControl = false;
         isDebug = false;
-        coinCount = 0;
         timeCount = 0;
+
+        // Load total coins collected from the database
+        dbHelper = new DatabaseHelper(getContext());
+        coinCount = dbHelper.getTotalCoins(); // Load coins only for a new game
+
 
         // Initialize and start the MediaPlayer for gameplay audio
         gameplayMediaPlayer = MediaPlayer.create(context, R.raw.gameplay);
@@ -74,9 +88,10 @@ public class GameScene extends GameView {
 
     @Override
     protected void onInitialization() {
+
         // Bird
-        bird = new Bird(Vector2.Zero, Vector2.multiply(Vector2.One, 0.3f));
-        bird.setPosition(new Vector2(-bird.getRawRect().width(), GameConstants.SCREEN_HEIGHT * 0.3f));
+        bird = new Bird(Vector2.Zero, Vector2.multiply(Vector2.One, 0.2f));
+        bird.setPosition(new Vector2(-bird.getRawRect().width(), GameConstants.SCREEN_HEIGHT * 0.2f));
 
         // Single Background
         backGround = new BackGround(Vector2.Zero, Vector2.One);
@@ -120,7 +135,28 @@ public class GameScene extends GameView {
         firework1.initializeSound(getContext());
         firework2.initializeSound(getContext());
 
+        //display coins
+        coinCountPaint = new Paint();
+        coinCountPaint.setColor(Color.parseColor("#18284a"));
+        coinCountPaint.setTextSize(75);
+        coinCountPaint.setTypeface(ResourcesCompat.getFont(getContext(), R.font.pixelated));
+        coinIcon = BitmapFactory.decodeResource(getResources(), R.drawable.coin1);
+
         reloadSpeed();
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+
+        int iconX = 20;
+        int iconY = 40;
+        int textX = iconX + coinIcon.getWidth() + 10;
+        int textY = iconY + coinIcon.getHeight() / 2 + 20;
+
+        // Draw the coin count at the top right corner of the screen
+        canvas.drawBitmap(coinIcon, iconX, iconY, null);
+        canvas.drawText(coinCount + " Coins" , textX, textY, coinCountPaint);
     }
 
     @Override
@@ -148,6 +184,7 @@ public class GameScene extends GameView {
         firework1.applyAnimation(16);
         firework2.applyAnimation(16);
     }
+
 
     @Override
     public void logicUpdate() {
@@ -263,11 +300,12 @@ public class GameScene extends GameView {
 
         isGameOver = false;
         canControl = false;
-        coinCount = 0;
+        //coinCount = dbHelper.getTotalCoins();
         timeCount = 0;
         lastFrameShowTime = System.currentTimeMillis();
         reloadSpeed();
         invalidate();
+        //dbHelper = new DatabaseHelper(getContext());
 
         if (gameplayMediaPlayer == null) {
             gameplayMediaPlayer = MediaPlayer.create(getContext(), R.raw.gameplay);
@@ -345,6 +383,7 @@ public class GameScene extends GameView {
             playSound(R.raw.coin_sound);
             coin.setPosition(new Vector2(-coin.getRect().width(), 0));
             coinCount++;
+            invalidate();
         }
     }
 
@@ -421,6 +460,7 @@ public class GameScene extends GameView {
         });
     }
 
+
     private int getBestScore(DatabaseHelper dbHelper) {
         Cursor cursor = dbHelper.getStats();
         if (cursor != null && cursor.moveToFirst()) {
@@ -442,6 +482,10 @@ public class GameScene extends GameView {
         if (gameOverMediaPlayer != null) {
             gameOverMediaPlayer.release();
             gameOverMediaPlayer = null;
+        }
+        if (coinIcon != null) {
+            coinIcon.recycle();
+            coinIcon = null;
         }
     }
 }
