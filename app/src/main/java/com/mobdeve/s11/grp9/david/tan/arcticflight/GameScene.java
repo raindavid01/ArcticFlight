@@ -53,6 +53,10 @@ public class GameScene extends GameView {
     private DatabaseHelper dbHelper;
     private SharedPreferences sharedPreferences;
 
+    /**
+     * Constructs a new GameScene instance with the given context and attribute set.
+     * Initializes various game states, objects, and media players.
+     */
     public GameScene(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
@@ -73,22 +77,24 @@ public class GameScene extends GameView {
 
         // Initialize SharedPreferences
         sharedPreferences = context.getSharedPreferences("GameSettings", Context.MODE_PRIVATE);
-
-
     }
 
+    /**
+     * Initializes the game objects and their properties.
+     * Called once when the game scene is created.
+     */
     @Override
     protected void onInitialization() {
-
-        // Bird
+        // Initialize bird object
         bird = new Bird(Vector2.Zero, Vector2.multiply(Vector2.One, 0.2f));
         bird.setPosition(new Vector2(-bird.getRawRect().width(), GameConstants.SCREEN_HEIGHT * 0.2f));
         loadHatSelection();
-        // Single Background
+
+        // Initialize background object
         backGround = new BackGround(Vector2.Zero, Vector2.One);
         backGround.setSize(new Vector2((float) GameConstants.SCREEN_WIDTH / backGround.getRect().width(), (float) GameConstants.SCREEN_HEIGHT / backGround.getRect().height()));
 
-        // BaseGround
+        // Initialize base grounds
         BaseGround baseGround1 = new BaseGround(Vector2.Zero, Vector2.One);
         baseGround1.setSize(new Vector2((float) GameConstants.SCREEN_WIDTH / baseGround1.getRect().width(), 0.3f));
         baseGround1.setPosition(new Vector2(0, GameConstants.SCREEN_HEIGHT - baseGround1.getRect().height()));
@@ -99,6 +105,7 @@ public class GameScene extends GameView {
         baseGround2.setPosition(new Vector2(baseGround2.getRect().width(), GameConstants.SCREEN_HEIGHT - baseGround2.getRect().height()));
         baseGrounds.add(baseGround2);
 
+        // Initialize pipes
         for (int i = 0; i < 3; i++) {
             Pipe pipeU = new Pipe(Vector2.Zero, Vector2.multiply(Vector2.One, 0.4f));
             pipeU.setPosition(new Vector2(GameConstants.SCREEN_WIDTH + (i + 1) * Pipe.INTERVAL, 0));
@@ -111,9 +118,11 @@ public class GameScene extends GameView {
             pipes.add(pipeD);
         }
 
+        // Initialize coin object
         coin = new Coin(Vector2.Zero, Vector2.multiply(Vector2.One, 1.1f));
         coin.boundYRange((float) GameConstants.SCREEN_HEIGHT / 10, GameConstants.SCREEN_HEIGHT - baseGround1.getRect().height() - (float) GameConstants.SCREEN_HEIGHT / 10);
 
+        // Initialize timer objects
         timer = new Timer(Vector2.Zero, Vector2.multiply(Vector2.One, 1.5f));
         timer.setAlignTopCenter(new Vector2((float) GameConstants.SCREEN_WIDTH / 2, GameConstants.SCREEN_HEIGHT * 0.1f));
 
@@ -121,16 +130,23 @@ public class GameScene extends GameView {
         frameRateShower.setDebugGreen();
         frameRateShower.setAlignTopRight(new Vector2(GameConstants.SCREEN_WIDTH, 0));
 
+        // Initialize firework objects
         firework1 = new Firework(new Vector2((float) GameConstants.SCREEN_WIDTH / 2 - 150, GameConstants.SCREEN_HEIGHT * 0.0f), Vector2.One);
         firework2 = new Firework(new Vector2((float) GameConstants.SCREEN_WIDTH / 2 - 500, GameConstants.SCREEN_HEIGHT * 0.0f), Vector2.One);
         firework1.initializeSound(getContext());
         firework2.initializeSound(getContext());
-        // Adjust size as necessary
+
+        // Initialize coin display
         coinDisplay = new CoinDisplay(getContext(), Vector2.Zero, Vector2.multiply(Vector2.One, 1.1f), totalCoins);
 
+        // Set initial speed
         reloadSpeed();
     }
 
+    /**
+     * Registers game objects to the scene.
+     * Called once when the game scene is created.
+     */
     @Override
     protected void onRegistration() {
         registerObject(bird, 1);
@@ -151,6 +167,10 @@ public class GameScene extends GameView {
         registerObject(coinDisplay, 1);
     }
 
+    /**
+     * Updates the rendering of game objects.
+     * Called on each frame render.
+     */
     @Override
     public void renderUpdate() {
         bird.applyAnimation(16);
@@ -159,6 +179,10 @@ public class GameScene extends GameView {
         firework2.applyAnimation(16);
     }
 
+    /**
+     * Updates the logic of game objects.
+     * Called on each frame update.
+     */
     @Override
     public void logicUpdate() {
         if (!canControl && bird.getPosition().x >= (float) (100 * GameConstants.SCREEN_WIDTH) / 1080) {
@@ -204,7 +228,6 @@ public class GameScene extends GameView {
 
         float elapsedFrameTime = (float) (System.currentTimeMillis() - lastFrameShowTime) / 1000.0f;
 
-
         cycleCheck();
 
         if (!bird.IsDead) {
@@ -220,6 +243,10 @@ public class GameScene extends GameView {
         }
     }
 
+    /**
+     * Handles touch events.
+     * Called when the user interacts with the screen.
+     */
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -235,12 +262,20 @@ public class GameScene extends GameView {
         return true;
     }
 
+    /**
+     * Starts the game scene.
+     * Called when the game is started or resumed.
+     */
     @Override
     public void start() {
         reloadSpeed();
         super.start();
     }
 
+    /**
+     * Resets the game scene to its initial state.
+     * Called when the game is restarted.
+     */
     public void reset() {
         bird.setPosition(new Vector2(-bird.getRawRect().width(), GameConstants.SCREEN_HEIGHT * 0.3f));
         bird.IsDead = false;
@@ -274,8 +309,8 @@ public class GameScene extends GameView {
         lastFrameShowTime = System.currentTimeMillis();
         reloadSpeed();
         invalidate();
-        // dbHelper = new DatabaseHelper(getContext());
 
+        // Reinitialize gameplay MediaPlayer if null
         if (gameplayMediaPlayer == null) {
             gameplayMediaPlayer = MediaPlayer.create(getContext(), R.raw.gameplay);
             gameplayMediaPlayer.setLooping(true);
@@ -283,6 +318,10 @@ public class GameScene extends GameView {
         }
     }
 
+    /**
+     * Restarts the game scene.
+     * Called when the game is restarted after a game over.
+     */
     public void restart() {
         if (isGameOver) {
             reset();
@@ -293,6 +332,10 @@ public class GameScene extends GameView {
         unfreeze();
     }
 
+    /**
+     * Checks and resets the position of game objects if they go off-screen.
+     * Called on each frame update.
+     */
     private void cycleCheck() {
         if (backGround.getPosition().x <= -GameConstants.SCREEN_WIDTH) {
             float offset = backGround.getPosition().x + GameConstants.SCREEN_WIDTH;
@@ -333,6 +376,10 @@ public class GameScene extends GameView {
         }
     }
 
+    /**
+     * Checks for collisions between the bird and other game objects.
+     * Called on each frame update.
+     */
     private void checkCollision() {
         for (BaseGround baseGround : baseGrounds) {
             if (bird.collisionCheck(baseGround)) {
@@ -358,6 +405,10 @@ public class GameScene extends GameView {
         }
     }
 
+    /**
+     * Reloads the speed of game objects from shared preferences.
+     * Called when the game is started or reset.
+     */
     private void reloadSpeed() {
         // Load the selected speed from SharedPreferences
         speed = sharedPreferences.getFloat("selectedSpeed", GameConstants.DIFFICULTY.two);
@@ -380,6 +431,10 @@ public class GameScene extends GameView {
         coin.setVelocity(Vector2.multiply(Vector2.Left, speed));
     }
 
+    /**
+     * Handles game over logic.
+     * Called when the bird dies.
+     */
     private void onGameOver() {
         playSound(R.raw.die_sound);
         score = timeCount;
@@ -421,6 +476,11 @@ public class GameScene extends GameView {
         gameplayActivity.runOnUiThread(() -> gameplayActivity.showGameOverDialog(score, finalBestScore));
     }
 
+    /**
+     * Retrieves the best score from the database.
+     * @param dbHelper The database helper for accessing the database.
+     * @return The best score.
+     */
     private int getBestScore(DatabaseHelper dbHelper) {
         Cursor cursor = dbHelper.getStats();
         if (cursor != null && cursor.moveToFirst()) {
@@ -431,6 +491,10 @@ public class GameScene extends GameView {
         return 0;
     }
 
+    /**
+     * Loads the hat selection from shared preferences.
+     * Called when the game scene is initialized.
+     */
     public void loadHatSelection() {
         SharedPreferences preferences = getContext().getSharedPreferences("GamePrefs", Context.MODE_PRIVATE);
         int hatIndex = preferences.getInt("selectedHatIndex", 0);  // Default to 0 if no value set
@@ -440,6 +504,10 @@ public class GameScene extends GameView {
         }
     }
 
+    /**
+     * Releases resources when the view is detached from the window.
+     * Called when the view is removed from the window.
+     */
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
@@ -450,6 +518,10 @@ public class GameScene extends GameView {
         }
     }
 
+    /**
+     * Cleans up resources.
+     * Called when the game scene is destroyed.
+     */
     protected void cleanup() {
         // Release the MediaPlayer resources
         if (gameplayMediaPlayer != null) {
@@ -503,18 +575,30 @@ public class GameScene extends GameView {
         }
     }
 
+    /**
+     * Pauses the gameplay music.
+     * Called when the game is paused.
+     */
     public void pauseMusic() {
         if (gameplayMediaPlayer != null && gameplayMediaPlayer.isPlaying()) {
             gameplayMediaPlayer.pause();
         }
     }
 
+    /**
+     * Resumes the gameplay music.
+     * Called when the game is resumed.
+     */
     public void resumeMusic() {
         if (gameplayMediaPlayer != null && !gameplayMediaPlayer.isPlaying()) {
             gameplayMediaPlayer.start();
         }
     }
 
+    /**
+     * Plays a sound effect.
+     * @param soundId The resource ID of the sound to play.
+     */
     public void playSound(int soundId) {
         if (shouldPlaySound) {
             MediaPlayer soundPlayer = MediaPlayer.create(getContext(), soundId);
@@ -523,9 +607,12 @@ public class GameScene extends GameView {
         }
     }
 
+    /**
+     * Sets whether the music should stop.
+     * @param shouldStop True if the music should stop, false otherwise.
+     */
     public void setShouldStopMusic(boolean shouldStop) {
         shouldStopMusic = shouldStop;
         shouldPlaySound = !shouldStop;
     }
-
 }
