@@ -28,7 +28,6 @@ public class GameScene extends GameView {
     private Random random;
     private boolean isGameOver;
     private boolean canControl;
-    private boolean isDebug;
     private long lastFrameShowTime;
     private int coinCount;
     private int totalCoins;
@@ -60,7 +59,6 @@ public class GameScene extends GameView {
         random = new Random();
         isGameOver = false;
         canControl = false;
-        isDebug = false;
         coinCount = 0;
         timeCount = 0;
 
@@ -206,10 +204,6 @@ public class GameScene extends GameView {
 
         float elapsedFrameTime = (float) (System.currentTimeMillis() - lastFrameShowTime) / 1000.0f;
 
-        if (isDebug && GameConstants.DELTA_TIME != 0 && elapsedFrameTime >= 0.5f) {
-            frameRateShower.timerUpdate((int) (1000 / GameConstants.DELTA_TIME));
-            lastFrameShowTime = System.currentTimeMillis();
-        }
 
         cycleCheck();
 
