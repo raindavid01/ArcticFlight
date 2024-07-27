@@ -16,11 +16,11 @@ Arctic Flight reimagines the popular arcade game Flappy Bird with a contemporary
 - **Scoring System**: Players earn points by navigating through ice blocks, with real-time score updates.
 - **Milestones**: Players can achieve milestones based on the number of ice blocks passed without crashing, earning rewards for each milestone.
 - **Visual and Audio Design**: Enhances player immersion with a tailored soundtrack, dynamic sound effects, and vivid graphical content.
-- **Shop System**: Allows players to purchase skins and power-ups using collected coins.
-- **Penguin Skins**: Offers a variety of customizable skins for character personalization.
+- **Shop System**: Allows players to purchase penguin skins.
+- **Penguin Skins**: Offers a variety of penguin hats for character personalization.
 - **Coin Collection System**: Enables coin collection during gameplay which can be utilized in the shop for purchases.
 - **Difficulty Levels**: Players can select from multiple difficulty settings (easy, normal, hard) to match their skill level.
-- **Settings**: Provides options for players to adjust sound effects, audio, and difficulty to customize their gaming experience.
+- **Settings**: Provides options for players to adjust audio and difficulty to customize their gaming experience.
 
 ## Assets
 - **Fireworks Animations**, **Coin Animations**, and **Sound Files** are all credited to [itch.io](https://itch.io/game-assets) and their respective creators
