@@ -21,3 +21,6 @@ Arctic Flight reimagines the popular arcade game Flappy Bird with a contemporary
 - **Coin Collection System**: Enables coin collection during gameplay which can be utilized in the shop for purchases.
 - **Difficulty Levels**: Players can select from multiple difficulty settings (easy, normal, hard) to match their skill level.
 - **Settings**: Provides options for players to adjust sound effects, audio, and difficulty to customize their gaming experience.
+
+## Assets
+- **Fireworks Animations**, **Coin Animations**, and **Sound Files** are all credited to [itch.io](https://itch.io/game-assets) and their respective creators
