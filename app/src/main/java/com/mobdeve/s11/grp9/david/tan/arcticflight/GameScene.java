@@ -50,8 +50,6 @@ public class GameScene extends GameView {
 
     // MediaPlayer for gameplay audio
     private MediaPlayer gameplayMediaPlayer;
-    // MediaPlayer for game over audio
-    private MediaPlayer gameOverMediaPlayer;
     private DatabaseHelper dbHelper;
     private SharedPreferences sharedPreferences;
 
@@ -450,10 +448,6 @@ public class GameScene extends GameView {
             gameplayMediaPlayer.release();
             gameplayMediaPlayer = null;
         }
-        if (gameOverMediaPlayer != null) {
-            gameOverMediaPlayer.release();
-            gameOverMediaPlayer = null;
-        }
     }
 
     protected void cleanup() {
@@ -461,10 +455,6 @@ public class GameScene extends GameView {
         if (gameplayMediaPlayer != null) {
             gameplayMediaPlayer.release();
             gameplayMediaPlayer = null;
-        }
-        if (gameOverMediaPlayer != null) {
-            gameOverMediaPlayer.release();
-            gameOverMediaPlayer = null;
         }
         // Clean up other resources
         if (dbHelper != null) {
