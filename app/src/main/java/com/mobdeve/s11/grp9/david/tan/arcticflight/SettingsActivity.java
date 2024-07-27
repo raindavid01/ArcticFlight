@@ -17,9 +17,9 @@ import com.mobdeve.s11.grp9.david.tan.arcticflight.utils.GameConstants;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    private AudioManager audioManager;
-    private Button oneBtn, twoBtn, threeBtn;
-    private SharedPreferences sharedPreferences;
+    private AudioManager audioManager; // AudioManager for controlling volume
+    private Button oneBtn, twoBtn, threeBtn; // Buttons for selecting game difficulty
+    private SharedPreferences sharedPreferences; // SharedPreferences for saving settings
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,20 +35,21 @@ public class SettingsActivity extends AppCompatActivity {
         showDialogSettingsPopup();
     }
 
+    // Method to show the settings dialog
     private void showDialogSettingsPopup() {
         Dialog dialog = new Dialog(SettingsActivity.this);
         dialog.setContentView(R.layout.settings);
         dialog.setCanceledOnTouchOutside(false);
-        dialog.setOnDismissListener(dialogInterface -> finish());
+        dialog.setOnDismissListener(dialogInterface -> finish()); // Finish activity when dialog is dismissed
 
         dialog.getWindow().setLayout(850, 1100);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         Button backBtn = dialog.findViewById(R.id.shopbackBtn);
-        backBtn.setOnClickListener(v -> dialog.dismiss());
+        backBtn.setOnClickListener(v -> dialog.dismiss()); // Dismiss dialog on back button click
 
         SeekBar volumeSeekBar = dialog.findViewById(R.id.seekBar);
-        setupVolumeControl(volumeSeekBar);
+        setupVolumeControl(volumeSeekBar); // Set up volume control SeekBar
 
         oneBtn = dialog.findViewById(R.id.oneBtn);
         twoBtn = dialog.findViewById(R.id.twoBtn);
@@ -64,6 +65,7 @@ public class SettingsActivity extends AppCompatActivity {
             selectButton(threeBtn, GameConstants.DIFFICULTY.three);
         }
 
+        // Set click listeners for difficulty buttons
         oneBtn.setOnClickListener(v -> selectButton(oneBtn, GameConstants.DIFFICULTY.one));
         twoBtn.setOnClickListener(v -> selectButton(twoBtn, GameConstants.DIFFICULTY.two));
         threeBtn.setOnClickListener(v -> selectButton(threeBtn, GameConstants.DIFFICULTY.three));
@@ -71,17 +73,19 @@ public class SettingsActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    // Method to set up the volume control SeekBar
     private void setupVolumeControl(SeekBar seekBar) {
-        int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        int currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+        int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC); // Get max volume level
+        int currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC); // Get current volume level
 
         seekBar.setMax(maxVolume);
         seekBar.setProgress(currentVolume);
 
+        // Set SeekBar change listener
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0);
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0); // Change volume
             }
 
             @Override
@@ -96,8 +100,9 @@ public class SettingsActivity extends AppCompatActivity {
         });
     }
 
+    // Method to handle button selection and save the selected speed
     private void selectButton(Button selectedButton, float speed) {
-        // Reset backgrounds
+        // Reset backgrounds to default
         oneBtn.setBackgroundResource(R.drawable.one);
         twoBtn.setBackgroundResource(R.drawable.two);
         threeBtn.setBackgroundResource(R.drawable.three);
