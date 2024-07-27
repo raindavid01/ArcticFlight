@@ -191,6 +191,7 @@ public class GameScene extends GameView {
                     if (timeCount % 10 == 0) {
                         coinCount += 10;
                         totalCoins += 10;
+                        coinDisplay.setCoinCount(totalCoins);
                         firework1.activate();
                         firework2.activate();
                         // Schedule deactivation of the firework after a short delay
