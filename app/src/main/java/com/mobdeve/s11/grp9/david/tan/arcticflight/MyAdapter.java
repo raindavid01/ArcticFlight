@@ -24,7 +24,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     private boolean[] equipped;
     private int coins;
     private DatabaseHelper dbHelper;
-    private SharedPreferences prefs;
+    private SharedPreferences gamePrefs, shopPrefs;
+    private HatSelectionListener hatSelectionListener;
 
     public MyAdapter(Context context, int[] arr, int initialCoins, DatabaseHelper dbHelper) {
         this.context = context;
@@ -33,37 +34,43 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         this.equipped = new boolean[arr.length];
         this.coins = initialCoins;
         this.dbHelper = dbHelper;
-        this.prefs = context.getSharedPreferences("ShopPrefs", Context.MODE_PRIVATE);
+        this.shopPrefs = context.getSharedPreferences("ShopPrefs", Context.MODE_PRIVATE);
+        this.gamePrefs = context.getSharedPreferences("GamePrefs", Context.MODE_PRIVATE);
         loadOwned();
 
     }
 
+    public void setHatSelectionListener(HatSelectionListener listener) {
+        this.hatSelectionListener = listener;
+    }
+
+
     private void loadOwned() {
         for (int i = 0; i < arr.length; i++) {
-            owned[i] = prefs.getBoolean("owned_" + i, false);
-            equipped[i] = prefs.getBoolean("equipped_" + i, false);
+            owned[i] = shopPrefs.getBoolean("owned_" + i, false);
+            equipped[i] = shopPrefs.getBoolean("equipped_" + i, false);
         }
     }
 
     private void saveOwned(int position, boolean isOwned) {
-        SharedPreferences.Editor editor = prefs.edit();
+        SharedPreferences.Editor editor = shopPrefs.edit();
         editor.putBoolean("owned_" + position, isOwned);
         editor.apply();
     }
 
     private void saveEquip(int position, boolean isEquipped) {
-        SharedPreferences.Editor editor = prefs.edit();
+        SharedPreferences.Editor editor = shopPrefs.edit();
         if (isEquipped) {
-            // First, unequip all items
+            // unequip all items
             for (int i = 0; i < equipped.length; i++) {
                 equipped[i] = false; // Update internal state
                 editor.putBoolean("equipped_" + i, false);
             }
-            // Then equip the selected item
+            // equip the selected item
             equipped[position] = true; // Update internal state
             editor.putBoolean("equipped_" + position, true);
         } else {
-            // Unequip the selected item
+            // unequip the selected item
             equipped[position] = false; // Update internal state
             editor.putBoolean("equipped_" + position, false);
         }
@@ -99,6 +106,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
                 buyBtn.setOnClickListener(v -> {
                     // Unequip this item
                     saveEquip(position, false);
+                    hatSelectionListener.onHatSelected(0);
                     notifyItemChanged(position); // Update this item only
                 });
             } else {
@@ -106,6 +114,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
                 buyBtn.setOnClickListener(v -> {
                     // Equip this item and unequip others
                     saveEquip(position, true);
+                    hatSelectionListener.onHatSelected(position + 1);
                     notifyItemRangeChanged(0, arr.length); // Update all items to reflect changes
                 });
             }
@@ -120,6 +129,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
                     saveOwned(position, true);
                     // Equip this newly bought item and unequip others
                     saveEquip(position, true);
+                    hatSelectionListener.onHatSelected(position + 1);
                     notifyItemRangeChanged(0, arr.length); // Update all items to reflect changes
                     Toast.makeText(context, "Purchase successful!", Toast.LENGTH_SHORT).show();
                 } else {
@@ -127,6 +137,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
                 }
             });
         }
+    }
+
+    public interface HatSelectionListener {
+        void onHatSelected(int hatIndex);
     }
 
     @Override

@@ -8,9 +8,11 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -20,7 +22,7 @@ import com.mobdeve.s11.grp9.david.tan.arcticflight.utils.DatabaseHelper;
 
 import java.io.IOException;
 
-public class ShopActivity extends AppCompatActivity {
+public class ShopActivity extends AppCompatActivity implements MyAdapter.HatSelectionListener {
 
     private RecyclerView recyclerView;
     RecyclerView.LayoutManager layoutManager;
@@ -28,6 +30,7 @@ public class ShopActivity extends AppCompatActivity {
     private TextView tvTotalCoins;
     private DatabaseHelper dbHelper;
     private MediaPlayer mediaPlayer;
+
 
     int[] arr = {R.drawable.santa, R.drawable.tophat, R.drawable.cap};
 
@@ -43,8 +46,11 @@ public class ShopActivity extends AppCompatActivity {
 
         layoutManager = new GridLayoutManager(getApplicationContext(), 3);
         recyclerView.setLayoutManager(layoutManager);
+
         myAdapter = new MyAdapter(this, arr, totalCoins, dbHelper);
-        recyclerView.setAdapter(myAdapter);
+        myAdapter.setHatSelectionListener(this);
+        Log.d("HatSelection", "Listener set in ShopActivity");
+
         recyclerView.setAdapter(myAdapter);
         recyclerView.setHasFixedSize(true);
 
@@ -115,5 +121,19 @@ public class ShopActivity extends AppCompatActivity {
             mediaPlayer.release();
             mediaPlayer = null;
         }
+    }
+
+    public void saveHatSelection(int hatIndex) {
+        SharedPreferences preferences = getSharedPreferences("GamePrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt("selectedHatIndex", hatIndex);
+        editor.apply();  // Apply the changes asynchronously
+    }
+
+    @Override
+    public void onHatSelected(int hatIndex) {
+        Log.d("HatSelection", "Hat selected: " + hatIndex);  // Add this line for debugging
+        saveHatSelection(hatIndex);
+        Toast.makeText(this, "Hat selected: " + hatIndex, Toast.LENGTH_SHORT).show();
     }
 }

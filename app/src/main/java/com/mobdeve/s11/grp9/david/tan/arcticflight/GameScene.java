@@ -75,6 +75,8 @@ public class GameScene extends GameView {
 
         // Initialize SharedPreferences
         sharedPreferences = context.getSharedPreferences("GameSettings", Context.MODE_PRIVATE);
+
+
     }
 
     @Override
@@ -83,7 +85,7 @@ public class GameScene extends GameView {
         // Bird
         bird = new Bird(Vector2.Zero, Vector2.multiply(Vector2.One, 0.2f));
         bird.setPosition(new Vector2(-bird.getRawRect().width(), GameConstants.SCREEN_HEIGHT * 0.2f));
-
+        loadHatSelection();
         // Single Background
         backGround = new BackGround(Vector2.Zero, Vector2.One);
         backGround.setSize(new Vector2((float) GameConstants.SCREEN_WIDTH / backGround.getRect().width(), (float) GameConstants.SCREEN_HEIGHT / backGround.getRect().height()));
@@ -439,6 +441,15 @@ public class GameScene extends GameView {
             return bestScore;
         }
         return 0;
+    }
+
+    public void loadHatSelection() {
+        SharedPreferences preferences = getContext().getSharedPreferences("GamePrefs", Context.MODE_PRIVATE);
+        int hatIndex = preferences.getInt("selectedHatIndex", 0);  // Default to 0 if no value set
+        Log.d("HatSelection", "Loaded hat index: " + hatIndex);
+        if (bird != null) {
+            bird.changeHat(hatIndex);
+        }
     }
 
     @Override
