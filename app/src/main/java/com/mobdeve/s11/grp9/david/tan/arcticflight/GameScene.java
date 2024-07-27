@@ -45,6 +45,8 @@ public class GameScene extends GameView {
     private final ArrayList<Pipe> pipes = new ArrayList<>();
     private float speed;
     private CoinDisplay coinDisplay;
+    private boolean shouldPlaySound = true;
+    private boolean shouldStopMusic = true;
 
     // MediaPlayer for gameplay audio
     private MediaPlayer gameplayMediaPlayer;
@@ -407,14 +409,7 @@ public class GameScene extends GameView {
         }
 
         // Initialize and start the MediaPlayer for game over audio
-        gameOverMediaPlayer = MediaPlayer.create(getContext(), R.raw.game_over);
-        gameOverMediaPlayer.start();
-
-        // Release the MediaPlayer when the audio finishes playing
-        gameOverMediaPlayer.setOnCompletionListener(mp -> {
-            mp.release();
-            gameOverMediaPlayer = null;
-        });
+        playSound(R.raw.game_over);
 
         DatabaseHelper dbHelper = new DatabaseHelper(getContext());
         int bestScore = getBestScore(dbHelper);
@@ -517,4 +512,30 @@ public class GameScene extends GameView {
             coinDisplay.cleanup();
         }
     }
+
+    public void pauseMusic() {
+        if (gameplayMediaPlayer != null && gameplayMediaPlayer.isPlaying()) {
+            gameplayMediaPlayer.pause();
+        }
+    }
+
+    public void resumeMusic() {
+        if (gameplayMediaPlayer != null && !gameplayMediaPlayer.isPlaying()) {
+            gameplayMediaPlayer.start();
+        }
+    }
+
+    public void playSound(int soundId) {
+        if (shouldPlaySound) {
+            MediaPlayer soundPlayer = MediaPlayer.create(getContext(), soundId);
+            soundPlayer.setOnCompletionListener(MediaPlayer::release);
+            soundPlayer.start();
+        }
+    }
+
+    public void setShouldStopMusic(boolean shouldStop) {
+        shouldStopMusic = shouldStop;
+        shouldPlaySound = !shouldStop;
+    }
+
 }

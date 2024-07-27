@@ -22,6 +22,7 @@ import com.mobdeve.s11.grp9.david.tan.arcticflight.utils.GameConstants;
 public class MainActivity extends AppCompatActivity {
     private HomeBinding binding;
     private MediaPlayer mediaPlayer;
+    private boolean shouldStopMusic = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
         binding.playBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                shouldStopMusic = true;
                 stopMusic();
                 Log.d("MainActivity", "Play button clicked");
                 Intent intent = new Intent(MainActivity.this, GameplayActivity.class);
@@ -55,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
         binding.shopBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                shouldStopMusic = true;
                 stopMusic();
                 Log.d("MainActivity", "Shop button clicked");
                 Intent intent = new Intent(MainActivity.this, ShopActivity.class);
@@ -66,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
         binding.settingsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                shouldStopMusic = false;
                 Log.d("MainActivity", "Settings button clicked");
                 blurBackground();
                 Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
@@ -104,6 +108,14 @@ public class MainActivity extends AppCompatActivity {
         ConstraintLayout mainLayout = findViewById(R.id.home_layout);
         if (mainLayout != null) {
             mainLayout.setAlpha(1.0f);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (shouldStopMusic) {
+            stopMusic();
         }
     }
 

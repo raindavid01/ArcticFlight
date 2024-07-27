@@ -80,6 +80,30 @@ public class GameplayActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    public void playSound(int soundId) {
+        if (gameScene != null) {
+            gameScene.playSound(soundId);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (gameScene != null) {
+            gameScene.setShouldStopMusic(true);
+            gameScene.pauseMusic();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (gameScene != null) {
+            gameScene.setShouldStopMusic(false);
+            gameScene.resumeMusic();
+        }
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
