@@ -1,7 +1,9 @@
 package com.mobdeve.s11.grp9.david.tan.arcticflight;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
@@ -37,14 +39,16 @@ public class ShopActivity extends AppCompatActivity {
         tvTotalCoins = findViewById(R.id.coinTv);
 
         dbHelper = new DatabaseHelper(this);
+        int totalCoins = dbHelper.getTotalCoins();
 
         layoutManager = new GridLayoutManager(getApplicationContext(), 3);
         recyclerView.setLayoutManager(layoutManager);
-        myAdapter = new MyAdapter(this, arr);
+        myAdapter = new MyAdapter(this, arr, totalCoins, dbHelper);
+        recyclerView.setAdapter(myAdapter);
         recyclerView.setAdapter(myAdapter);
         recyclerView.setHasFixedSize(true);
 
-        updateCoinDisplay();
+        updateCoinDisplay(totalCoins);
 
         // Initialize and start the media player
         mediaPlayer = MediaPlayer.create(this, R.raw.shop);
@@ -53,6 +57,7 @@ public class ShopActivity extends AppCompatActivity {
 
 
         Button shopbackBtn = findViewById(R.id.shopbackBtn);
+
         shopbackBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -63,16 +68,16 @@ public class ShopActivity extends AppCompatActivity {
         });
     }
 
-    private void updateCoinDisplay() {
-        int totalCoins = dbHelper.getTotalCoins();
-        tvTotalCoins.setText(totalCoins + " Coins"); // Update the text to reflect the total coins
+    public void updateCoinDisplay(int coins) {
+        tvTotalCoins.setText(coins + " Coins");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        updateCoinDisplay();  // Update coins every time the activity resumes
-
+        int totalCoins = dbHelper.getTotalCoins();
+        updateCoinDisplay(totalCoins);
+        myAdapter.setCoins(totalCoins); // Update coins in adapter
     }
 
     @Override

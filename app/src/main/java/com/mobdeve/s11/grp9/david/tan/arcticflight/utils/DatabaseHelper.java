@@ -63,5 +63,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return totalCoins;
     }
 
+    public void purchaseUpdate(int coinsToSubtract) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Get the latest session's ID
+        Cursor cursor = db.rawQuery("SELECT id, coins FROM " + TABLE_NAME + " ORDER BY id DESC LIMIT 1", null);
+        if (cursor.moveToFirst()) {
+            int lastSessionId = cursor.getInt(0);
+            int currentCoins = cursor.getInt(1);
+
+            // Calculate new coin count
+            int newCoinCount = currentCoins - coinsToSubtract;
+
+            // Update the coin count in the database
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_COINS, newCoinCount);
+            db.update(TABLE_NAME, values, "id = ?", new String[] {String.valueOf(lastSessionId)});
+        }
+        cursor.close();
+    }
+
 }
 
