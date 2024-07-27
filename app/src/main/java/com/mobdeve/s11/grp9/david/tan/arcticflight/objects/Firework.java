@@ -15,17 +15,17 @@ import java.util.ArrayList;
 public class Firework extends GameObject {
 
     // Render
-    private final ArrayList<Bitmap> sprites = new ArrayList<>();
-    private long lastAnimationTime;
-    private int currentSpriteIndex;
-    private boolean isActive;
-    private MediaPlayer mediaPlayer;
+    private final ArrayList<Bitmap> sprites = new ArrayList<>();  // List of firework sprites
+    private long lastAnimationTime;  // Time of the last animation update
+    private int currentSpriteIndex;  // Index of the current sprite in the animation cycle
+    private boolean isActive;  // Indicates whether the firework is active
+    private MediaPlayer mediaPlayer;  // MediaPlayer for the firework sound
 
     /**
-     * Constructs a new GameObject instance with the given position and size.
+     * Constructs a new Firework instance with the given position and size.
      *
-     * @param position The top-left position of the game object
-     * @param size     The size of the game object
+     * @param position The top-left position of the game object.
+     * @param size     The size of the game object.
      */
     public Firework(Vector2 position, Vector2 size) {
         super(position, size);
@@ -40,17 +40,29 @@ public class Firework extends GameObject {
         sprites.add(Sprite.loadSprite(R.drawable.firework6));
         sprites.add(Sprite.loadSprite(R.drawable.firework7));
 
+        // Set initial sprite and offset
         currentSpriteIndex = 0;
         sprite = sprites.get(0);
         spriteOffset = new Vector2(-18, -10);
 
+        // Firework is initially inactive
         isActive = false;
     }
 
+    /**
+     * Initializes the MediaPlayer for the firework sound.
+     *
+     * @param context The context for accessing resources.
+     */
     public void initializeSound(Context context) {
         mediaPlayer = MediaPlayer.create(context, R.raw.fireworks);
     }
 
+    /**
+     * Applies animation to the firework based on the frame rate.
+     *
+     * @param frameRate The frame rate for the animation.
+     */
     public void applyAnimation(long frameRate) {
         if (!isActive) return;
 
@@ -58,13 +70,16 @@ public class Firework extends GameObject {
         long elapsedTime = currentTime - lastAnimationTime;
 
         if (elapsedTime >= 1000 / frameRate) {
-            // Change and Rotate Sprite
+            // Change to the next sprite in the animation cycle
             currentSpriteIndex = (currentSpriteIndex + 1) % sprites.size();
             setSprite(sprites.get(currentSpriteIndex), 0);
             lastAnimationTime = currentTime;
         }
     }
 
+    /**
+     * Activates the firework and starts the animation and sound.
+     */
     public void activate() {
         currentSpriteIndex = 1;
         isActive = true;
@@ -73,6 +88,9 @@ public class Firework extends GameObject {
         }
     }
 
+    /**
+     * Deactivates the firework and stops the animation and sound.
+     */
     public void deactivate() {
         isActive = false;
         sprite = sprites.get(0);
@@ -82,8 +100,11 @@ public class Firework extends GameObject {
         }
     }
 
+    /**
+     * Cleans up resources by recycling bitmaps and releasing the MediaPlayer.
+     */
     public void cleanup() {
-        // Recycle and nullify bitmaps
+        // Recycle and nullify bitmaps to free up memory
         for (Bitmap sprite : sprites) {
             if (sprite != null) {
                 sprite.recycle();
@@ -97,5 +118,4 @@ public class Firework extends GameObject {
             mediaPlayer = null;
         }
     }
-
 }

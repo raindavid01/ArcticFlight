@@ -11,29 +11,27 @@ import com.mobdeve.s11.grp9.david.tan.arcticflight.structs.Vector2;
 
 import java.util.ArrayList;
 
-public class Timer extends GameObject
-{
+public class Timer extends GameObject {
     // Render
-    public final int[] NUM_SIZE = new int[2];
-    public boolean CanGlow;
-    private int timeCount;
-    private Vector2 alignTopLeft = Vector2.Zero.copy();
-    private Vector2 alignTopCenter = null;
-    private Vector2 alignTopRight = null;
-    private final int GAP = 5;
-    private final ArrayList<Bitmap> numSprites = new ArrayList<Bitmap>();
+    public final int[] NUM_SIZE = new int[2];  // Size of number sprites
+    public boolean CanGlow;  // Flag to indicate if the timer can glow
+    private int timeCount;  // Current time count
+    private Vector2 alignTopLeft = Vector2.Zero.copy();  // Position to align top-left
+    private Vector2 alignTopCenter = null;  // Position to align top-center
+    private Vector2 alignTopRight = null;  // Position to align top-right
+    private final int GAP = 5;  // Gap between number sprites
+    private final ArrayList<Bitmap> numSprites = new ArrayList<>();  // List of number sprites
 
     /**
-     * Constructs a new GameObject instance with the given position and size.
+     * Constructs a new Timer instance with the given position and size.
      *
      * @param position The top-left position of the game object
      * @param size     The size of the game object
      */
-    public Timer(Vector2 position, Vector2 size)
-    {
+    public Timer(Vector2 position, Vector2 size) {
         super(position, size);
 
-        // Initialize Sprites
+        // Initialize number sprites
         numSprites.add(Sprite.loadSprite(R.drawable.number0));
         numSprites.add(Sprite.loadSprite(R.drawable.number1));
         numSprites.add(Sprite.loadSprite(R.drawable.number2));
@@ -45,48 +43,68 @@ public class Timer extends GameObject
         numSprites.add(Sprite.loadSprite(R.drawable.number8));
         numSprites.add(Sprite.loadSprite(R.drawable.number9));
 
+        // Set the size of the number sprites
         NUM_SIZE[0] = numSprites.get(0).getWidth();
         NUM_SIZE[1] = numSprites.get(0).getHeight();
         timeCount = 0;
         CanGlow = false;
     }
 
-    public void setAlignTopLeft(Vector2 alignPos)
-    {
+    /**
+     * Sets the alignment to top-left.
+     *
+     * @param alignPos The top-left alignment position
+     */
+    public void setAlignTopLeft(Vector2 alignPos) {
         alignTopLeft = alignPos;
         alignTopCenter = null;
         alignTopRight = null;
     }
 
-    public void setAlignTopCenter(Vector2 alignPos)
-    {
+    /**
+     * Sets the alignment to top-center.
+     *
+     * @param alignPos The top-center alignment position
+     */
+    public void setAlignTopCenter(Vector2 alignPos) {
         alignTopLeft = null;
         alignTopCenter = alignPos;
         alignTopRight = null;
     }
 
-    public void setAlignTopRight(Vector2 alignPos)
-    {
+    /**
+     * Sets the alignment to top-right.
+     *
+     * @param alignPos The top-right alignment position
+     */
+    public void setAlignTopRight(Vector2 alignPos) {
         alignTopLeft = null;
         alignTopCenter = null;
         alignTopRight = alignPos;
     }
 
-    public void timerUpdate(int time)
-    {
+    /**
+     * Updates the timer with the given time.
+     *
+     * @param time The new time count
+     */
+    public void timerUpdate(int time) {
         timeCount = time;
 
-        // Create a New Thread for calculation Image Results
-        new Thread(new Runnable()
-        {
+        // Create a new thread for calculating the image result
+        new Thread(new Runnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 rawTimerUpdate(time);
             }
         }).start();
     }
 
+    /**
+     * Updates the timer's display with the given time.
+     *
+     * @param time The new time count
+     */
     public void rawTimerUpdate(int time) {
         int digitWidth = NUM_SIZE[0];
         int digitHeight = NUM_SIZE[1];
@@ -95,6 +113,7 @@ public class Timer extends GameObject
         int[] pixels = new int[bitmapWidth * digitHeight];
         int index = 0;
 
+        // Draw each digit of the time onto the bitmap
         for (char digit : String.valueOf(time).toCharArray()) {
             int digitInt = Character.getNumericValue(digit);
             Log.d("Timer", "Processing digit: " + digitInt);
@@ -119,7 +138,7 @@ public class Timer extends GameObject
         timerBitmap.setPixels(pixels, 0, bitmapWidth, 0, 0, bitmapWidth, digitHeight);
         sprite = timerBitmap;
 
-        // Align Position
+        // Align the position
         if (alignTopCenter != null) {
             position.x = alignTopCenter.x - (float) getRect().width() / 2;
             position.y = alignTopCenter.y;
@@ -132,11 +151,16 @@ public class Timer extends GameObject
         }
     }
 
-    public void setDebugGreen()
-    {
+    /**
+     * Sets the number sprites to green for debugging.
+     */
+    public void setDebugGreen() {
         numSprites.replaceAll(sprite -> Sprite.colorSprite(sprite, Color.GREEN));
     }
 
+    /**
+     * Cleans up resources by recycling bitmaps.
+     */
     public void cleanup() {
         // Recycle and nullify bitmaps
         for (Bitmap numSprite : numSprites) {
@@ -146,6 +170,4 @@ public class Timer extends GameObject
         }
         numSprites.clear();
     }
-
 }
-
